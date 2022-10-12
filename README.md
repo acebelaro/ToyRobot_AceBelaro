@@ -27,3 +27,7 @@ test_ToyRobot
 
 ### Notes
 * When using Visual Studio IDE, download package `Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.5`
+
+### Todo
+* Solution to workaround for _strdup (in util.cpp)
+* Add automated integration test for console application built
