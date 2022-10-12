@@ -38,9 +38,13 @@ GTEST_HEADERS 	= $(GTEST_DIR)/include/gtest/*.h \
 GTEST_SRCS_ 	= $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
 
 # The build target 
+ifeq ($(OS),Windows_NT)
 OUT 			= ToyRobot
 TEST 			= test_ToyRobot
-
+else
+OUT 			= ToyRobot.out
+TEST 			= test_ToyRobot.out
+endif
 _SRC_OBJS = main.o game.o robot.o table.o command.o command_parser.o util.o
 SRC_OBJS = $(patsubst %,$(OUTPUT_OBJ_DIR)/%,$(_SRC_OBJS))
 
@@ -71,7 +75,7 @@ $(OUTPUT_OBJ_DIR)/gtest_main.a : $(OUTPUT_OBJ_DIR)/gtest-all.o $(OUTPUT_OBJ_DIR)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(OUTPUT_OBJ_DIR)/%.o: $(TEST_SOURCE_DIR)/%.cpp 
-	$(CC) $(GTEST_CPPFLAGS) -c -o $@ $<
+	$(CC) $(GTEST_CPPFLAGS) -c -o $@ $< -DWORK_AROUND_STRDUP
 
 $(TEST) : $(TEST_OBJS) $(SRC_OBJ) $(OUTPUT_OBJ_DIR)/gtest_main.a
 	$(CC) $(GTEST_CPPFLAGS) -lpthread $^ -o $@
@@ -79,4 +83,4 @@ $(TEST) : $(TEST_OBJS) $(SRC_OBJ) $(OUTPUT_OBJ_DIR)/gtest_main.a
 .PHONY: clean
 
 clean:
-	rm $(OUTPUT_OBJ_DIR)/*.o $(OUT)
+	rm $(OUTPUT_OBJ_DIR)/*.o $(OUTPUT_OBJ_DIR)/*.a $(OUT) $(TEST)
