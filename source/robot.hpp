@@ -49,7 +49,7 @@ public:
 	* @brief Gets the table the robot is placed
 	* @return table
 	*/
-	CTable* const GetTable();
+	CTable* GetTable();
 	/**
 	* @brief Checks if robot is placed
 	* @retval true	- robot is placed

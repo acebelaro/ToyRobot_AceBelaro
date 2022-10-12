@@ -22,6 +22,7 @@ GTEST_CPPFLAGS	+= -Wall
 GTEST_CPPFLAGS	+= -Wextra
 GTEST_CPPFLAGS	+= -pthread
 GTEST_CPPFLAGS	+= -isystem $(GTEST_DIR)/include
+GTEST_CPPFLAGS	+= -I$(SOURCE_DIR)
 
 # ---------------------------------------------------------------------
 #                            Other variables
@@ -63,10 +64,22 @@ $(OUTPUT_OBJ_DIR)/gtest.a : $(OUTPUT_OBJ_DIR)/gtest-all.o
 $(OUTPUT_OBJ_DIR)/gtest_main.a : $(OUTPUT_OBJ_DIR)/gtest-all.o $(OUTPUT_OBJ_DIR)/gtest_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
-$(OUTPUT_OBJ_DIR)/test_main.o : $(TEST_SOURCE_DIR)/test_main.cpp $(GTEST_HEADERS)
-	$(CC) $(GTEST_CPPFLAGS) -c $(TEST_SOURCE_DIR)/test_main.cpp -o $(OUTPUT_OBJ_DIR)/test_main.o
+$(OUTPUT_OBJ_DIR)/test_util.o : $(TEST_SOURCE_DIR)/test_util.cpp $(GTEST_HEADERS)
+	$(CC) $(GTEST_CPPFLAGS) -c $(TEST_SOURCE_DIR)/test_util.cpp -o $(OUTPUT_OBJ_DIR)/test_util.o
 
-$(TEST) : $(OUTPUT_OBJ_DIR)/test_main.o $(OUTPUT_OBJ_DIR)/gtest_main.a
+$(OUTPUT_OBJ_DIR)/test_table.o : $(TEST_SOURCE_DIR)/test_table.cpp $(GTEST_HEADERS)
+	$(CC) $(GTEST_CPPFLAGS) -c $(TEST_SOURCE_DIR)/test_table.cpp -o $(OUTPUT_OBJ_DIR)/test_table.o
+
+$(OUTPUT_OBJ_DIR)/test_robot.o : $(TEST_SOURCE_DIR)/test_robot.cpp $(GTEST_HEADERS)
+	$(CC) $(GTEST_CPPFLAGS) -c $(TEST_SOURCE_DIR)/test_robot.cpp -o $(OUTPUT_OBJ_DIR)/test_robot.o
+
+$(OUTPUT_OBJ_DIR)/test_command_parser.o : $(TEST_SOURCE_DIR)/test_command_parser.cpp $(GTEST_HEADERS)
+	$(CC) $(GTEST_CPPFLAGS) -c $(TEST_SOURCE_DIR)/test_command_parser.cpp -o $(OUTPUT_OBJ_DIR)/test_command_parser.o
+
+TEST_OBJ = $(OUTPUT_OBJ_DIR)/test_util.o $(OUTPUT_OBJ_DIR)/test_table.o $(OUTPUT_OBJ_DIR)/test_robot.o $(OUTPUT_OBJ_DIR)/test_command_parser.o
+SRC_OBJ = $(OUTPUT_OBJ_DIR)/util.o $(OUTPUT_OBJ_DIR)/table.o $(OUTPUT_OBJ_DIR)/command.o $(OUTPUT_OBJ_DIR)/robot.o $(OUTPUT_OBJ_DIR)/command_parser.o
+
+$(TEST) : $(TEST_OBJ) $(SRC_OBJ) $(OUTPUT_OBJ_DIR)/gtest_main.a
 	$(CC) $(GTEST_CPPFLAGS) -lpthread $^ -o $@
 
 .PHONY: clean
