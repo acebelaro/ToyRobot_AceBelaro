@@ -15,13 +15,13 @@ CommandParser -> Robot : command
 
 alt PLACE command
 
-Robot -> Table : validate position parameter
+Robot -> Table : validate position and direction parameter
 
-alt valid position parameter
+alt valid position and direction parameter
 
-Robot -> Robot : update position
+Robot -> Robot : update position and direction
 
-else invalid position parameter
+else invalid position and direction parameter
 
 Robot -> user : report invalid position parameter
 
@@ -51,7 +51,7 @@ Robot -> Robot : update direction
 
 else REPORT command
 
-Robot -> Robot : report
+Robot -> user : report position and direction
 
 end
 
