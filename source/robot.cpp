@@ -92,7 +92,7 @@ void CRobot::Rotate(CRotate rotate)
 	}
 }
 
-CTable* const CRobot::GetTable()
+CTable* CRobot::GetTable()
 {
 	return m_table;
 }

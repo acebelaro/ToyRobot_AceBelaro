@@ -172,7 +172,7 @@ CCommand* CCommandParser::ParseCommand(std::string str)
 	CCommand* command = nullptr;
 
 	if (0 < str.length()) {
-		CommandParserMap::iterator it;
+		tCommandParserMap::iterator it;
 		stCommandParseParam commandParseParam = ParseCommandParam(str);
 
 		for (it = m_commandParserMap.begin(); it != m_commandParserMap.end(); it++)

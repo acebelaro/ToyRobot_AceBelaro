@@ -18,7 +18,7 @@
                                     (sizeof(s_directionConverter[0])))
 
 //******************************************************************************
-//               Public function definition
+//               Private type definition
 //******************************************************************************
 
 /*
@@ -60,7 +60,7 @@ void SplitString(std::string str, char delimiter, std::vector<std::string>& dest
 
 bool StringToDirection(std::string directionName, CDirection* direction) {
     bool valid = false;
-    int i = 0;
+    unsigned int i = 0U;
     stDirectionConverter curr;
     while (DIRECTION_COVERTER_SIZE > i) {
         curr = s_directionConverter[i];
@@ -76,7 +76,7 @@ bool StringToDirection(std::string directionName, CDirection* direction) {
 
 std::string DirectionToString(CDirection directionVal) {
     std::string directionName = "";
-    int i = 0;
+    unsigned int i = 0U;
     stDirectionConverter curr;
     while (DIRECTION_COVERTER_SIZE > i ) {
         curr = s_directionConverter[i];

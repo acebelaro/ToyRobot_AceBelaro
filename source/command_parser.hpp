@@ -23,7 +23,7 @@ public:
 	*/
 	~CCommandParser();
 private:
-	CommandParserMap m_commandParserMap;	/* command name to parser map */
+	tCommandParserMap m_commandParserMap;	/* command name to parser map */
 	/**
 	* @brief Parses input to create command parameter
 	* @param str	- input string

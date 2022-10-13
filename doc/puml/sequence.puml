@@ -1,0 +1,64 @@
+@startuml
+
+actor user
+box Game
+participant CommandParser
+participant Robot
+participant Table
+end box
+
+user -> CommandParser : input command (string)
+
+alt valid input command (string)
+
+CommandParser -> Robot : command
+
+alt PLACE command
+
+Robot -> Table : validate position parameter
+
+alt valid position parameter
+
+Robot -> Robot : update position
+
+else invalid position parameter
+
+Robot -> user : report invalid position parameter
+
+end
+
+else MOVE command
+
+Robot -> Table : validate new position
+
+alt valid new position 
+
+Robot -> Robot : update position
+
+else invalid new position 
+
+Robot -> user : report robot tipping off
+
+end
+
+else RIGHT command
+
+Robot -> Robot : update direction
+
+else LEFT command
+
+Robot -> Robot : update direction
+
+else REPORT command
+
+Robot -> Robot : report
+
+end
+
+else invalid command
+
+CommandParser -> user : report invalid command
+
+end
+
+@enduml

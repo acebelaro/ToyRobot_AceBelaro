@@ -35,9 +35,11 @@ void CGame::PrintTable()
 {
 	std::string toPrint = " * ";
 	stPosition position = m_robot->GetPosition();
-	for (int h = m_table->GetHeight() - 1; h >= 0; h--)
+	int height = m_table->GetHeight();
+	int width = m_table->GetWidth();
+	for (int h = height - 1; h >= 0; h--)
 	{
-		for (int w = 0; w < m_table->GetWidth(); w++)
+		for (int w = 0; w < width; w++)
 		{
 			toPrint = " * ";
 
