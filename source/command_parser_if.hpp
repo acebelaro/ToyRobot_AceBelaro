@@ -42,7 +42,7 @@ typedef tStringVector tCommandParserFuncParam;
 typedef CCommand* (*tCommandParserFunc)(tCommandParserFuncParam);
 
 /* Command name to command parser function map */
-typedef std::map<std::string, tCommandParserFunc> CommandParserMap;
+typedef std::map<std::string, tCommandParserFunc> tCommandParserMap;
 
 /* Command parser parameter defintition */
 typedef struct stCommandParseParam {
