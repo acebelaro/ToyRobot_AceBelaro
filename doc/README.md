@@ -1,0 +1,1 @@
+Generate design images from puml files in puml folder using PUML extension of Visual Studio Code.
