@@ -17,5 +17,5 @@ int main() {
 
 	game.Play();
 
-	return 1;
+	return 0;
 }
