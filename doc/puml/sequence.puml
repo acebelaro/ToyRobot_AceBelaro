@@ -1,7 +1,7 @@
 @startuml
 
 actor user
-box Game
+box Toy Robot
 participant CommandParser
 participant Robot
 participant Table
@@ -12,6 +12,8 @@ user -> CommandParser : input command (string)
 alt valid input command (string)
 
 CommandParser -> Robot : command
+
+==Place command==
 
 alt PLACE command
 
@@ -26,8 +28,13 @@ else invalid position and direction parameter
 Robot -> user : report invalid position parameter
 
 end
+'valid position and direction parameter
+
+==Move command==
 
 else MOVE command
+
+alt is robot placed?
 
 Robot -> Table : validate new position
 
@@ -40,25 +47,70 @@ else invalid new position
 Robot -> user : report robot tipping off
 
 end
+'valid new position 
+
+else
+
+Robot -> user : report robot not yet placed
+
+end
+'is robot placed?
+
+==Right command==
 
 else RIGHT command
 
+alt is robot placed?
+
 Robot -> Robot : update direction
+
+else
+
+Robot -> user : report robot not yet placed
+
+end
+'is robot placed?
+
+==Left command==
 
 else LEFT command
 
+alt is robot placed?
+
 Robot -> Robot : update direction
+
+else
+
+Robot -> user : report robot not yet placed
+
+end
+'is robot placed?
+
+==Report command==
 
 else REPORT command
 
+alt is robot placed?
+
 Robot -> user : report position and direction
 
+else
+
+Robot -> user : report robot not yet placed
+
 end
+'is robot placed?
+
+end
+'PLACE command
+
+==Invalid command==
 
 else invalid command
 
 CommandParser -> user : report invalid command
 
 end
+'valid input command (string)
 
 @enduml

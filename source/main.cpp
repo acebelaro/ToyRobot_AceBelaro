@@ -5,7 +5,7 @@
 //******************************************************************************
 
 #include "main.hpp"
-#include "game.hpp"
+#include "toy_robot.hpp"
 
 //******************************************************************************
 //               Public function definition
@@ -13,7 +13,7 @@
 
 int main() {
 
-	CGame game;
+	CToyRobot game;
 
 	game.Play();
 

@@ -1,4 +1,9 @@
-#include "game.hpp"
+//******************************************************************************
+/*! @file       toy_robot.cpp
+	@brief      Source definition for toy robot
+*/
+//******************************************************************************
+#include "toy_robot.hpp"
 #include "command_parser.hpp"
 #include <string>
 #include <iostream>
@@ -10,6 +15,7 @@
 #define TABLE_WIDTH		( 5 )	/* table width */
 #define TABLE_HEIGHT	( 5 )	/* table height */
 
+#define TILE_TOKEN		( " * " ) /* token for unoccupied tile */
 #define NORTH_AVATAR	( "^" )	/* avatar for robot facing NORTH */
 #define EAST_AVATAR		( ">" )	/* avatar for robot facing EAST */
 #define SOUTH_AVATAR	( "v" )	/* avatar for robot facing SOUTH */
@@ -19,35 +25,35 @@
 //               Class function definition
 //******************************************************************************
 
-CGame::CGame()
+CToyRobot::CToyRobot():
+	m_table(TABLE_WIDTH, TABLE_HEIGHT),
+	m_robot(&m_table)
 {
-	m_table = new CTable(TABLE_WIDTH, TABLE_HEIGHT);
-	m_robot = new CRobot(m_table);
+
 }
 
-CGame::~CGame()
+CToyRobot::~CToyRobot()
 {
-	delete m_robot;
-	delete m_table;
+	// do nothing
 }
 
-void CGame::PrintTable()
+void CToyRobot::PrintTable()
 {
 	std::string toPrint = " * ";
-	stPosition position = m_robot->GetPosition();
-	int height = m_table->GetHeight();
-	int width = m_table->GetWidth();
+	stPosition position = m_robot.GetPosition();
+	int height = m_table.GetHeight();
+	int width = m_table.GetWidth();
 	for (int h = height - 1; h >= 0; h--)
 	{
 		for (int w = 0; w < width; w++)
 		{
-			toPrint = " * ";
+			toPrint = TILE_TOKEN;
 
-			if (m_robot->IsPlaced())
+			if (m_robot.IsPlaced())
 			{
 				if (position.x == w && position.y == h)
 				{
-					switch (m_robot->GetDirection())
+					switch (m_robot.GetDirection())
 					{
 					case CDirection::NORTH:
 						toPrint = NORTH_AVATAR;
@@ -77,7 +83,7 @@ void CGame::PrintTable()
 	}
 }
 
-void CGame::Play()
+void CToyRobot::Play()
 {
 	CCommandParser commandParser;
 	std::string input;
@@ -100,7 +106,7 @@ void CGame::Play()
 				command = commandParser.ParseCommand(input);
 				if (nullptr != command)
 				{
-					result = m_robot->ApplyCommand(command);
+					result = m_robot.ApplyCommand(command);
 					switch (result)
 					{
 					case CCommandApplyResult::OK:

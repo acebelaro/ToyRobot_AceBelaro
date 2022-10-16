@@ -45,7 +45,7 @@ else
 OUT 			= ToyRobot.out
 TEST 			= test_ToyRobot.out
 endif
-_SRC_OBJS = main.o game.o robot.o table.o command.o command_parser.o util.o
+_SRC_OBJS = main.o toy_robot.o robot.o table.o command.o command_parser.o util.o
 SRC_OBJS = $(patsubst %,$(OUTPUT_OBJ_DIR)/%,$(_SRC_OBJS))
 
 SRC_OBJ = $(OUTPUT_OBJ_DIR)/util.o $(OUTPUT_OBJ_DIR)/table.o $(OUTPUT_OBJ_DIR)/command.o \

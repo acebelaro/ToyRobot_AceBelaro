@@ -82,6 +82,7 @@ std::string DirectionToString(CDirection directionVal) {
         curr = s_directionConverter[i];
         if (curr.directionVal == directionVal) {
             directionName = curr.directionName;
+            break;
         }
         i++;
     }

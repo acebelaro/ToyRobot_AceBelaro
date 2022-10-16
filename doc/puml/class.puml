@@ -1,5 +1,5 @@
 @startuml
-class CGame{
+class CToyRobot{
 - CTable table
 - CRobot robot
 - CCommandParser commandParser
@@ -14,7 +14,7 @@ class CRobot{
 - CTable table
 - bool isPlaced
 - CDirection direction
-- stPosition m_position
+- stPosition position
 - bool Move()
 - void Rotate()
 + CCommandApplyResult ApplyCommand(CCommand)
@@ -27,7 +27,7 @@ class CCommand{
 - bool doReport
 }
 class CCommandParser{
-- tCommandParserMap m_commandParserMap
+- tCommandParserMap commandParserMap
 - stCommandParseParam ParseCommandParam(string)
 - CCommand ParsePlaceCommand(stCommandParseParam)
 - CCommand ParseMoveCommand(stCommandParseParam)
@@ -39,10 +39,10 @@ class CCommandParser{
 
 CRobot - CTable : placed in >
 CCommandParser -- CCommand : parses >
-CCommand - CRobot : applies >
+CCommand - CRobot : applies in >
 
-CGame -- CTable : owns >
-CGame -- CRobot : owns >
-CGame -- CCommandParser : owns >
+CToyRobot -- CTable : owns >
+CToyRobot -- CRobot : owns >
+CToyRobot -- CCommandParser : owns >
 
 @enduml
