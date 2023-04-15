@@ -3,9 +3,11 @@
 # ---------------------------------------------------------------------
 
 SOURCE_DIR		= source
+INCLUDE_DIR		= include
 TEST_SOURCE_DIR	= ./test
 GTEST_DIR		= ./googletest/googletest
 OUTPUT_OBJ_DIR	= obj
+APP_SOURCE 		= app/ToyRobotApp.cpp
 
 # ---------------------------------------------------------------------
 #                            CPP flags
@@ -15,6 +17,7 @@ BUILD_CPPFLAGS	= -std=c++14
 BUILD_CPPFLAGS	+= -g
 BUILD_CPPFLAGS	+= -Wall
 BUILD_CPPFLAGS	+= -DWORK_AROUND_STRDUP
+BUILD_CPPFLAGS	+= -I$(INCLUDE_DIR)
 	
 GTEST_CPPFLAGS	= -std=c++14
 GTEST_CPPFLAGS	+= -g
@@ -22,7 +25,7 @@ GTEST_CPPFLAGS	+= -Wall
 GTEST_CPPFLAGS	+= -Wextra
 GTEST_CPPFLAGS	+= -pthread
 GTEST_CPPFLAGS	+= -isystem $(GTEST_DIR)/include
-GTEST_CPPFLAGS	+= -I$(SOURCE_DIR)
+GTEST_CPPFLAGS	+= -I$(INCLUDE_DIR)
 
 # ---------------------------------------------------------------------
 #                            Other variables
@@ -45,20 +48,17 @@ else
 OUT 			= ToyRobot.out
 TEST 			= test_ToyRobot.out
 endif
-_SRC_OBJS = main.o game.o robot.o table.o command.o command_parser.o util.o
-SRC_OBJS = $(patsubst %,$(OUTPUT_OBJ_DIR)/%,$(_SRC_OBJS))
 
-SRC_OBJ = $(OUTPUT_OBJ_DIR)/util.o $(OUTPUT_OBJ_DIR)/table.o $(OUTPUT_OBJ_DIR)/command.o \
-	$(OUTPUT_OBJ_DIR)/robot.o $(OUTPUT_OBJ_DIR)/command_parser.o
+TARGET = ToyRobotApp
 
-_TEST_OBJS = test_util.o test_table.o test_robot.o test_command_parser.o
-TEST_OBJS = $(patsubst %,$(OUTPUT_OBJ_DIR)/%,$(_TEST_OBJS))
+SOURCES := .\source\command_parser.cpp \
+		   .\source\command.cpp \
+		   .\source\robot.cpp \
+		   .\source\table.cpp \
+		   .\source\util.cpp \
 
-$(OUTPUT_OBJ_DIR)/%.o: $(SOURCE_DIR)/%.cpp 
-	$(CC) -c -o $@ $< $(BUILD_CPPFLAGS) 
-
-$(OUT): $(SRC_OBJS)
-	$(CC) $(BUILD_CPPFLAGS) -o $(OUT) $(SRC_OBJS)
+${TARGET}: ${SOURCES}
+	${CC} ${BUILD_CPPFLAGS} -o ${TARGET} ${SOURCES} ${APP_SOURCE}
 
 tests: $(TEST)
 
@@ -74,8 +74,17 @@ $(OUTPUT_OBJ_DIR)/gtest.a : $(OUTPUT_OBJ_DIR)/gtest-all.o
 $(OUTPUT_OBJ_DIR)/gtest_main.a : $(OUTPUT_OBJ_DIR)/gtest-all.o $(OUTPUT_OBJ_DIR)/gtest_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
+$(OUTPUT_OBJ_DIR)/%.o: $(SOURCE_DIR)/%.cpp 
+	$(CC) -c -o $@ $< $(BUILD_CPPFLAGS) 
+
 $(OUTPUT_OBJ_DIR)/%.o: $(TEST_SOURCE_DIR)/%.cpp 
 	$(CC) $(GTEST_CPPFLAGS) -c -o $@ $< -DWORK_AROUND_STRDUP
+
+SRC_OBJ = $(OUTPUT_OBJ_DIR)/util.o $(OUTPUT_OBJ_DIR)/table.o $(OUTPUT_OBJ_DIR)/command.o \
+	$(OUTPUT_OBJ_DIR)/robot.o $(OUTPUT_OBJ_DIR)/command_parser.o
+
+_TEST_OBJS = test_util.o test_table.o test_robot.o test_command_parser.o
+TEST_OBJS = $(patsubst %,$(OUTPUT_OBJ_DIR)/%,$(_TEST_OBJS))
 
 $(TEST) : $(TEST_OBJS) $(SRC_OBJ) $(OUTPUT_OBJ_DIR)/gtest_main.a
 	$(CC) $(GTEST_CPPFLAGS) -lpthread $^ -o $@

@@ -3,16 +3,16 @@
 #include "robot.hpp"
 
 /* Game class */
-class CGame {
+class CToyRobotApp {
 public:
 	/**
 	* @brief Game constructor
 	*/
-	CGame();
+	CToyRobotApp();
 	/**
 	* @brief Robot deconstructor
 	*/
-	~CGame();
+	~CToyRobotApp();
 private:
 	CRobot* m_robot;	/* robot instance */
 	CTable* m_table;	/* table instance */
@@ -26,3 +26,9 @@ public:
 	*/
 	void Play();
 };
+
+//******************************************************************************
+//               Public function declaration
+//******************************************************************************
+
+int main();
