@@ -1,4 +1,4 @@
-#include "game.hpp"
+#include "ToyRobotApp.hpp"
 #include "command_parser.hpp"
 #include <string>
 #include <iostream>
@@ -19,19 +19,19 @@
 //               Class function definition
 //******************************************************************************
 
-CGame::CGame()
+CToyRobotApp::CToyRobotApp()
 {
 	m_table = new CTable(TABLE_WIDTH, TABLE_HEIGHT);
 	m_robot = new CRobot(m_table);
 }
 
-CGame::~CGame()
+CToyRobotApp::~CToyRobotApp()
 {
 	delete m_robot;
 	delete m_table;
 }
 
-void CGame::PrintTable()
+void CToyRobotApp::PrintTable()
 {
 	std::string toPrint = " * ";
 	stPosition position = m_robot->GetPosition();
@@ -77,14 +77,12 @@ void CGame::PrintTable()
 	}
 }
 
-void CGame::Play()
+void CToyRobotApp::Play()
 {
 	CCommandParser commandParser;
 	std::string input;
 	CCommand* command;
 	CCommandApplyResult result;
-
-	std::cout << "Started Game..." << std::endl;
 
 	while (true) {
 		PrintTable();
@@ -136,4 +134,17 @@ void CGame::Play()
 			std::cout << std::endl;
 		}
 	}
+}
+
+//******************************************************************************
+//               Public function definition
+//******************************************************************************
+
+int main() {
+
+	CToyRobotApp app;
+
+	app.Play();
+
+	return 1;
 }
