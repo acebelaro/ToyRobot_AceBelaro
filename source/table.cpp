@@ -9,41 +9,39 @@
 //               Class function definition
 //******************************************************************************
 
-CTable::CTable(int width, int height)
+Table::Table( int width, int height ):
+	_width(width), _height(height)
 {
-	if (0 <= width && 0 <= height)
-	{
-		m_width = width;
-		m_height = height;
-	}
-	else
-	{
-		throw TableInvalidSizeException();
-	}
+
 }
 
-CTable::~CTable()
+int Table::GetWidth() const
 {
-	// Do nothing
+	return _width;
 }
 
-int CTable::GetWidth() {
-	return m_width;
+void Table::SetWidth(int width)
+{
+	_width = width;
 }
 
-int CTable::GetHeight() {
-	return m_height;
+int Table::GetHeight() const
+{
+	return _height;
 }
 
-bool CTable::IsPositionAllowed(stPosition const* position)
+void Table::SetHeight(int height)
+{
+	_height = height;
+}
+
+bool Table::IsCoordinatesWithinBounds(const Coordinate& coordinate) const
 {
 	bool allowed = false;
-	int x = position->x;
-	int y = position->y;
-	if (x >= 0 && 
-		y >= 0 &&
-		x < m_width && 
-		y < m_height) {
+	int x = coordinate.GetX();
+	int y = coordinate.GetY();
+	if( x >= 0 && y >= 0 && x < _width && y < _height )
+	{
 		allowed = true;
 	}
 	return allowed;

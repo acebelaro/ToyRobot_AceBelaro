@@ -2,29 +2,18 @@
 
 #include "robot.hpp"
 
-/* Game class */
+using namespace std;
+
 class CToyRobotApp {
-public:
-	/**
-	* @brief Game constructor
-	*/
-	CToyRobotApp();
-	/**
-	* @brief Robot deconstructor
-	*/
-	~CToyRobotApp();
-private:
-	CRobot* m_robot;	/* robot instance */
-	CTable* m_table;	/* table instance */
-	/*
-	* @brief prints table
-	*/
-	void PrintTable();
-public:
-	/*
-	* @brief play function
-	*/
-	void Play();
+	public:
+		CToyRobotApp();
+		~CToyRobotApp() = default;
+	private:
+		Robot _robot;
+		Table _table;
+		void PrintTable();
+	public:
+		void Play();
 };
 
 //******************************************************************************

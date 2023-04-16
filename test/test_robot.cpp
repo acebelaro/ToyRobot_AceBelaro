@@ -4,669 +4,411 @@
 */
 //******************************************************************************
 
-#include "gtest/gtest.h"
+#include "test_toyRobot.hpp"
 #include "robot.hpp"
-#include "test_helper.h"
 
-//******************************************************************************
-//               Private type declaration
-//******************************************************************************
-
-/** Test move command class */
-class CTestMoveCommand : public CCommand
+static void test_robotInitialState()
 {
-public:
-	/**
-	* @brief Test move command constructor
-	*/
-    CTestMoveCommand()
-    {
-        SetMove(true);
-    }
-	/**
-	* @brief Test move command deconstructor
-	*/
-    ~CTestMoveCommand(){}
-};
+	Robot robot;
 
-/** Test right command class */
-class CTestRightCommand : public CCommand
-{
-public:
-	/**
-	* @brief Test right command constructor
-	*/
-    CTestRightCommand()
-    {
-        SetRotate( CRotate::RIGHT );
-    }
-	/**
-	* @brief Test right command deconstructor
-	*/
-    ~CTestRightCommand(){}
-};
-
-/** Test left command class */
-class CTestLeftCommand : public CCommand
-{
-public:
-	/**
-	* @brief Test left command constructor
-	*/
-    CTestLeftCommand()
-    {
-        SetRotate( CRotate::LEFT );
-    }
-	/**
-	* @brief Test left command deconstructor
-	*/
-    ~CTestLeftCommand(){}
-};
-
-//******************************************************************************
-//               Private function declaration
-//******************************************************************************
-
-/*
-* @brief Test helper to assert robot position
-* @param robot
-* @param x
-* @param y
-*/
-void AssertRobotPosition(CRobot* const robot, int x, int y);
-
-/*
-* @brief Test helper to assert robot direction
-* @param robot
-* @param direction
-*/
-void AssertRobotDirection(CRobot* const robot, CDirection direction);
-
-/*
-* @brief Test helper to assert robot is in initial state
-* @param robot
-*/
-void AssertRobotInInitState(CRobot* const robot);
-
-//******************************************************************************
-//               Private function definition
-//******************************************************************************
-
-void AssertRobotPosition(CRobot* const robot, int x, int y)
-{
-    stPosition position = robot->GetPosition();
-    EXPECT_EQ(x, position.x);
-    EXPECT_EQ(y, position.y);
+	assert(robot.IsPlaced() == false);
+	assert(robot.GetCoordinate().GetX() == 0 );
+	assert(robot.GetCoordinate().GetY() == 0 );
+	assert(robot.GetDirection() == Direction::NORTH );
 }
 
-void AssertRobotDirection(CRobot* const robot, CDirection direction)
+static void test_robotPlaceWithinBounds()
 {
-    int expectedDirection = static_cast<int>(direction);
-    int actualDirection = static_cast<int>(robot->GetDirection());
-    EXPECT_EQ(expectedDirection, actualDirection);
+	Robot robot;
+	Table table(5,5);
+	Coordinate coordinate(1,2);
+	Direction direction = Direction::SOUTH;
+	RobotPosition robotPosition(coordinate,direction);
+
+	robot.Place(robotPosition,table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::SOUTH );
+
+	coordinate.SetX(3);
+	coordinate.SetY(2);
+	robotPosition.SetCoordinate(coordinate);
+	direction = Direction::NORTH;
+	robotPosition.SetDirection(direction);
+	robot.Place(robotPosition,table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 3 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::NORTH );
+
+	coordinate.SetX(0);
+	coordinate.SetY(0);
+	robotPosition.SetCoordinate(coordinate);
+	direction = Direction::EAST;
+	robotPosition.SetDirection(direction);
+	robot.Place(robotPosition,table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 0 );
+	assert(robot.GetCoordinate().GetY() == 0 );
+	assert(robot.GetDirection() == Direction::EAST );
+
+	coordinate.SetX(4);
+	coordinate.SetY(1);
+	robotPosition.SetCoordinate(coordinate);
+	direction = Direction::WEST;
+	robotPosition.SetDirection(direction);
+	robot.Place(robotPosition,table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 4 );
+	assert(robot.GetCoordinate().GetY() == 1);
+	assert(robot.GetDirection() == Direction::WEST );
 }
 
-void AssertRobotInInitState(CRobot* const robot)
+static void test_robotPlaceOutsideBounds()
 {
-    EXPECT_FALSE(robot->IsPlaced());
-    AssertRobotDirection(robot, CDirection::NORTH);
-    AssertRobotPosition(robot, INIT_X_POS, INIT_Y_POS);
+	Robot robot;
+	Table table(5,5);
+	Coordinate coordinate(5,5);
+	Direction direction = Direction::SOUTH;
+	RobotPosition robotPosition(coordinate,direction);
+
+	robot.Place(robotPosition,table);
+	assert(robot.IsPlaced() == false);
+	assert(robot.GetCoordinate().GetX() == 0);
+	assert(robot.GetCoordinate().GetY() == 0 );
+	assert(robot.GetDirection() == Direction::NORTH );
+
+	coordinate.SetX(5);
+	coordinate.SetY(0);
+	robotPosition.SetCoordinate(coordinate);
+	direction = Direction::WEST;
+	robotPosition.SetDirection(direction);
+	robot.Place(robotPosition,table);
+	assert(robot.IsPlaced() == false);
+	assert(robot.GetCoordinate().GetX() == 0);
+	assert(robot.GetCoordinate().GetY() == 0 );
+	assert(robot.GetDirection() == Direction::NORTH );
+
+	coordinate.SetX(0);
+	coordinate.SetY(5);
+	robotPosition.SetCoordinate(coordinate);
+	direction = Direction::WEST;
+	robotPosition.SetDirection(direction);
+	robot.Place(robotPosition,table);
+	assert(robot.IsPlaced() == false);
+	assert(robot.GetCoordinate().GetX() == 0);
+	assert(robot.GetCoordinate().GetY() == 0 );
+	assert(robot.GetDirection() == Direction::NORTH );
+
+	coordinate.SetX(-1);
+	coordinate.SetY(-1);
+	robotPosition.SetCoordinate(coordinate);
+	direction = Direction::WEST;
+	robotPosition.SetDirection(direction);
+	robot.Place(robotPosition,table);
+	assert(robot.IsPlaced() == false);
+	assert(robot.GetCoordinate().GetX() == 0);
+	assert(robot.GetCoordinate().GetY() == 0 );
+	assert(robot.GetDirection() == Direction::NORTH );
+
+	coordinate.SetX(0);
+	coordinate.SetY(-1);
+	robotPosition.SetCoordinate(coordinate);
+	direction = Direction::WEST;
+	robotPosition.SetDirection(direction);
+	robot.Place(robotPosition,table);
+	assert(robot.IsPlaced() == false);
+	assert(robot.GetCoordinate().GetX() == 0);
+	assert(robot.GetCoordinate().GetY() == 0 );
+	assert(robot.GetDirection() == Direction::NORTH );
+
+	coordinate.SetX(-1);
+	coordinate.SetY(0);
+	robotPosition.SetCoordinate(coordinate);
+	direction = Direction::WEST;
+	robotPosition.SetDirection(direction);
+	robot.Place(robotPosition,table);
+	assert(robot.IsPlaced() == false);
+	assert(robot.GetCoordinate().GetX() == 0);
+	assert(robot.GetCoordinate().GetY() == 0 );
+	assert(robot.GetDirection() == Direction::NORTH );
 }
 
-//******************************************************************************
-//               Test functions
-//******************************************************************************
-
-/*! @brief Test robot initialisation
-*/
-TEST( TestRobot, Test_RobotInitialisation )
+static void test_robotRotateLeft()
 {
-    CTable table(5, 10);
-    CRobot robot(&table);
+	Robot robot;
+	Table table(5,5);
+	Coordinate coordinate(1,2);
+	RobotPosition robotPosition(coordinate,Direction::SOUTH);
 
-    AssertRobotInInitState(&robot);
+	robot.Place(robotPosition,table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::SOUTH );
+
+	robot.RotateLeft();
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::EAST );
+
+	robot.RotateLeft();
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::NORTH );
+
+	robot.RotateLeft();
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::WEST );
+
+	robot.RotateLeft();
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::SOUTH );
 }
 
-/*! @brief Test robot initialisation with NULL table throws exception
-*/
-TEST( TestRobot, Test_CreatingRobotExceptionForNullTable )
+static void test_robotRotateRight()
 {
-    bool exceptionThrown = false;
+	Robot robot;
+	Table table(5,5);
+	Coordinate coordinate(1,2);
+	RobotPosition robotPosition(coordinate,Direction::SOUTH);
 
-    try
-    {
-        CRobot robot(nullptr);
-    }
-    catch (RobotNullTableException& e)
-    {
-        exceptionThrown = true;
-        EXPECT_EQUAL_CONST_CHAR_STRING( "Unable to create robot with NULL table", e.what() );
-    }
-    EXPECT_TRUE(exceptionThrown);
+	robot.Place(robotPosition,table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::SOUTH );
+
+	robot.RotateRight();
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::WEST );
+
+	robot.RotateRight();
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::NORTH );
+
+	robot.RotateRight();
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::EAST );
+
+	robot.RotateRight();
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::SOUTH );
 }
 
-/*! @brief Test robot ignores non-PLACE command if not yet placed
-*/
-TEST( TestRobot, Test_RobotIgnoreNonPlaceCommandsIfNotYetPlaced )
+static void test_robotMoveSouth()
 {
-    CTable table(5, 5);
-    CRobot robot(&table);
-    CTestMoveCommand m_moveCommand;
-    CTestLeftCommand m_rotateLeftCommand;
+	Robot robot;
+	Table table(5,5);
+	Coordinate coordinate(1,2);
+	RobotPosition robotPosition(coordinate,Direction::SOUTH);
 
-    CCommandApplyResult result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::ROBOT_NOT_YET_PLACED),
-        static_cast<int>(result));
-    AssertRobotInInitState(&robot);
+	robot.Place(robotPosition,table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::SOUTH );
 
-    result = robot.ApplyCommand(&m_rotateLeftCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::ROBOT_NOT_YET_PLACED),
-        static_cast<int>(result));
-    AssertRobotInInitState(&robot);
+	robot.Move(table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 1 );
+	assert(robot.GetDirection() == Direction::SOUTH );
+
+	robot.Move(table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 0 );
+	assert(robot.GetDirection() == Direction::SOUTH );
+
+	robot.Move(table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 0 );
+	assert(robot.GetDirection() == Direction::SOUTH );
 }
 
-/*! @brief Test robot accepts PLACE command with valid position
-*/
-TEST( TestRobot, Test_RobotAcceptsPlaceCommandWithValidPosition)
+static void test_robotMoveNorth()
 {
-    CTable table(5, 5);
-    CRobot robot(&table);
-    stPlacement placement;
-    CCommand m_placeCommand;
+	Robot robot;
+	Table table(5,5);
+	Coordinate coordinate(1,2);
+	RobotPosition robotPosition(coordinate,Direction::NORTH);
 
-    placement.position.x = 1;
-    placement.position.y = 3;
-    placement.direction = CDirection::NORTH;
-    m_placeCommand.SetPlacement(placement);
+	robot.Place(robotPosition,table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::NORTH );
 
-    CCommandApplyResult result = robot.ApplyCommand(&m_placeCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    EXPECT_TRUE(robot.IsPlaced());
-    AssertRobotPosition(&robot, 1, 3);
+	robot.Move(table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 3 );
+	assert(robot.GetDirection() == Direction::NORTH );
+
+	robot.Move(table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 4 );
+	assert(robot.GetDirection() == Direction::NORTH );
+
+	robot.Move(table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 4 );
+	assert(robot.GetDirection() == Direction::NORTH );
 }
 
-/*! @brief Test robot can accept another PLACE command
-*/
-TEST( TestRobot, Test_RobotAcceptsAnotherPlaceCommandWithValidPosition)
+static void test_robotMoveEast()
 {
-    CTable table(5, 5);
-    CRobot robot(&table);
-    stPlacement placement;
-    CCommand m_placeCommand;
-    CTestMoveCommand m_moveCommand;
+	Robot robot;
+	Table table(5,5);
+	Coordinate coordinate(1,2);
+	RobotPosition robotPosition(coordinate,Direction::EAST);
 
-    placement.position.x = 1;
-    placement.position.y = 3;
-    placement.direction = CDirection::NORTH;
-    m_placeCommand.SetPlacement(placement);
+	robot.Place(robotPosition,table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::EAST );
 
-    CCommandApplyResult result = robot.ApplyCommand(&m_placeCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    EXPECT_TRUE(robot.IsPlaced());
-    AssertRobotPosition(&robot, 1, 3);
+	robot.Move(table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 2 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::EAST );
 
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
+	robot.Move(table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 3 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::EAST );
 
-    placement.position.x = 3;
-    placement.position.y = 1;
-    placement.direction = CDirection::EAST;
-    m_placeCommand.SetPlacement(placement);
+	robot.Move(table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 4 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::EAST );
 
-    result = robot.ApplyCommand(&m_placeCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    EXPECT_TRUE(robot.IsPlaced());
-    AssertRobotPosition(&robot, 3, 1);
+	robot.Move(table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 4 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::EAST );
 }
 
-/*! @brief Test robot rejects command with invalid position
-*/
-TEST( TestRobot, Test_RobotRejectsPlaceCommandWithInvalidPosition)
+static void test_robotMoveWest()
 {
-    CTable table(5, 5);
-    CRobot robot(&table);
-    stPlacement placement;
-    CCommand m_placeCommand;
+	Robot robot;
+	Table table(5,5);
+	Coordinate coordinate(4,2);
+	RobotPosition robotPosition(coordinate,Direction::WEST);
 
-    placement.position.x = -1;
-    placement.position.y = 3;
-    placement.direction = CDirection::NORTH;
-    m_placeCommand.SetPlacement(placement);
+	robot.Place(robotPosition,table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 4 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::WEST );
 
-    CCommandApplyResult result = robot.ApplyCommand(&m_placeCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::INVALID_PLACE),
-        static_cast<int>(result));
-    AssertRobotInInitState(&robot);
+	robot.Move(table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 3 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::WEST );
+
+	robot.Move(table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 2 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::WEST );
+
+	robot.Move(table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 1 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::WEST );
+
+	robot.Move(table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 0 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::WEST );
+
+	robot.Move(table);
+	assert(robot.IsPlaced());
+	assert(robot.GetCoordinate().GetX() == 0 );
+	assert(robot.GetCoordinate().GetY() == 2 );
+	assert(robot.GetDirection() == Direction::WEST );
 }
 
-/*! @brief Test robot accepts command after being placed
-*/
-TEST( TestRobot, Test_RobotAcceptsCommandAfterBeingPlaced)
+static void test_robotReport()
 {
-    CTable table(5, 5);
-    CRobot robot(&table);
-    stPlacement placement;
-    CCommand m_placeCommand;
-    CTestMoveCommand m_moveCommand;
+	Robot robot;
+	Table table(5,5);
+	Coordinate coordinate(1,2);
+	Direction direction = Direction::SOUTH;
+	RobotPosition robotPosition(coordinate,direction);
 
-    placement.position.x = 0;
-    placement.position.y = 0;
-    placement.direction = CDirection::NORTH;
-    m_placeCommand.SetPlacement(placement);
+	assert( robot.Report().compare("Robot not yet placed") == 0 );
 
-    CCommandApplyResult result = robot.ApplyCommand(&m_placeCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    EXPECT_TRUE(robot.IsPlaced());
+	robot.Place(robotPosition,table);
+	assert( robot.Report().compare("1,2,SOUTH") == 0 );
 
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 1);
+	coordinate.SetX(3);
+	coordinate.SetY(2);
+	robotPosition.SetCoordinate(coordinate);
+	direction = Direction::NORTH;
+	robotPosition.SetDirection(direction);
+	robot.Place(robotPosition,table);
+	assert( robot.Report().compare("3,2,NORTH") == 0 );
+
+	coordinate.SetX(0);
+	coordinate.SetY(0);
+	robotPosition.SetCoordinate(coordinate);
+	direction = Direction::EAST;
+	robotPosition.SetDirection(direction);
+	robot.Place(robotPosition,table);
+	assert( robot.Report().compare("0,0,EAST") == 0 );
+
+	coordinate.SetX(4);
+	coordinate.SetY(1);
+	robotPosition.SetCoordinate(coordinate);
+	direction = Direction::WEST;
+	robotPosition.SetDirection(direction);
+	robot.Place(robotPosition,table);
+	assert( robot.Report().compare("4,1,WEST") == 0 );
 }
 
-/*! @brief Test robot responds to rotate command after being placed
-*/
-TEST( TestRobot, Test_RobotRespondsCorrectlyToRotateCommandIfPlacedAlready)
+int testRobot()
 {
-    CTable table(5, 5);
-    CRobot robot(&table);
-    stPlacement placement;
-    CCommand m_placeCommand;
-    CTestLeftCommand m_rotateLeftCommand;
-    CTestRightCommand m_rotateRightCommand;
+	TestHashMap testHashMap("Robot");
+	testHashMap.AddTest("Test robot initial state",test_robotInitialState);
+	testHashMap.AddTest("Test robot place within bounds",test_robotPlaceWithinBounds);
+	testHashMap.AddTest("Test robot place outside bounds",test_robotPlaceOutsideBounds);
+	testHashMap.AddTest("Test robot rotate left",test_robotRotateLeft);
+	testHashMap.AddTest("Test robot rotate right",test_robotRotateRight);
+	testHashMap.AddTest("Test robot rotate move south",test_robotMoveSouth);
+	testHashMap.AddTest("Test robot rotate move north",test_robotMoveNorth);
+	testHashMap.AddTest("Test robot rotate move east",test_robotMoveEast);
+	testHashMap.AddTest("Test robot rotate move west",test_robotMoveWest);
+	testHashMap.AddTest("Test robot rotate report",test_robotReport);
+	testHashMap.ExecuteTests();
 
-    placement.position.x = 0;
-    placement.position.y = 0;
-    placement.direction = CDirection::NORTH;
-    m_placeCommand.SetPlacement(placement);
-
-    CCommandApplyResult result = robot.ApplyCommand(&m_placeCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    EXPECT_TRUE(robot.IsPlaced());
-
-    result = robot.ApplyCommand(&m_rotateLeftCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 0);
-    AssertRobotDirection(&robot, CDirection::WEST);
-
-    result = robot.ApplyCommand(&m_rotateLeftCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 0);
-    AssertRobotDirection(&robot, CDirection::SOUTH);
-
-    result = robot.ApplyCommand(&m_rotateLeftCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 0);
-    AssertRobotDirection(&robot, CDirection::EAST);
-
-    result = robot.ApplyCommand(&m_rotateLeftCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 0);
-    AssertRobotDirection(&robot, CDirection::NORTH);
-
-    result = robot.ApplyCommand(&m_rotateRightCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 0);
-    AssertRobotDirection(&robot, CDirection::EAST);
-
-    result = robot.ApplyCommand(&m_rotateRightCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 0);
-    AssertRobotDirection(&robot, CDirection::SOUTH);
-
-    result = robot.ApplyCommand(&m_rotateRightCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 0);
-    AssertRobotDirection(&robot, CDirection::WEST);
-
-    result = robot.ApplyCommand(&m_rotateRightCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 0);
-    AssertRobotDirection(&robot, CDirection::NORTH);
-}
-
-/*! @brief Test robot responds to move command after being placed
-*/
-TEST( TestRobot, Test_RobotRespondsCorrectlyToMoveCommandIfPlacedAlready)
-{
-    CTable table(5, 5);
-    CRobot robot(&table);
-    stPlacement placement;
-    CCommand m_placeCommand;
-    CTestMoveCommand m_moveCommand;
-    CTestRightCommand m_rotateRightCommand;
-    CTestLeftCommand m_rotateLeftCommand;
-
-    placement.position.x = 0;
-    placement.position.y = 0;
-    placement.direction = CDirection::NORTH;
-    m_placeCommand.SetPlacement(placement);
-
-    CCommandApplyResult result = robot.ApplyCommand(&m_placeCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    EXPECT_TRUE(robot.IsPlaced());
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 1);
-    AssertRobotDirection(&robot, CDirection::NORTH);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 2);
-    AssertRobotDirection(&robot, CDirection::NORTH);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 3);
-    AssertRobotDirection(&robot, CDirection::NORTH);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 4);
-    AssertRobotDirection(&robot, CDirection::NORTH);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::IGNORE_FALL_OFF_MOVE),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 4);
-    AssertRobotDirection(&robot, CDirection::NORTH);
-
-    // turn right
-    result = robot.ApplyCommand(&m_rotateRightCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 4);
-    AssertRobotDirection(&robot, CDirection::EAST);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 1, 4);
-    AssertRobotDirection(&robot, CDirection::EAST);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 2, 4);
-    AssertRobotDirection(&robot, CDirection::EAST);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 3, 4);
-    AssertRobotDirection(&robot, CDirection::EAST);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 4, 4);
-    AssertRobotDirection(&robot, CDirection::EAST);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::IGNORE_FALL_OFF_MOVE),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 4, 4);
-    AssertRobotDirection(&robot, CDirection::EAST);
-
-    // turn left
-    result = robot.ApplyCommand(&m_rotateLeftCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 4, 4);
-    AssertRobotDirection(&robot, CDirection::NORTH);
-
-    // turn left
-    result = robot.ApplyCommand(&m_rotateLeftCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 4, 4);
-    AssertRobotDirection(&robot, CDirection::WEST);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 3, 4);
-    AssertRobotDirection(&robot, CDirection::WEST);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 2, 4);
-    AssertRobotDirection(&robot, CDirection::WEST);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 1, 4);
-    AssertRobotDirection(&robot, CDirection::WEST);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 4);
-    AssertRobotDirection(&robot, CDirection::WEST);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::IGNORE_FALL_OFF_MOVE),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 4);
-    AssertRobotDirection(&robot, CDirection::WEST);
-
-    // turn left
-    result = robot.ApplyCommand(&m_rotateLeftCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 4);
-    AssertRobotDirection(&robot, CDirection::SOUTH);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 3);
-    AssertRobotDirection(&robot, CDirection::SOUTH);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 2);
-    AssertRobotDirection(&robot, CDirection::SOUTH);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 1);
-    AssertRobotDirection(&robot, CDirection::SOUTH);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 0);
-    AssertRobotDirection(&robot, CDirection::SOUTH);
-
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::IGNORE_FALL_OFF_MOVE),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 0);
-    AssertRobotDirection(&robot, CDirection::SOUTH);
-}
-
-/*! @brief Test robot test case 1
-*/
-TEST( TestRobot, Test_Robot_Place_0_0_North_Move)
-{
-    CTable table(5, 5);
-    CRobot robot(&table);
-    stPlacement placement;
-    CCommand m_placeCommand;
-    CTestMoveCommand m_moveCommand;
-
-    placement.position.x = 0;
-    placement.position.y = 0;
-    placement.direction = CDirection::NORTH;
-    m_placeCommand.SetPlacement(placement);
-
-    // place
-    CCommandApplyResult result = robot.ApplyCommand(&m_placeCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    EXPECT_TRUE(robot.IsPlaced());
-
-    // move
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 1);
-    AssertRobotDirection(&robot, CDirection::NORTH);
-}
-
-/*! @brief Test robot test case 2
-*/
-TEST( TestRobot, Test_Robot_Place_0_0_North_Left)
-{
-    CTable table(5, 5);
-    CRobot robot(&table);
-    stPlacement placement;
-    CCommand m_placeCommand;
-    CTestLeftCommand m_rotateLeftCommand;
-
-    placement.position.x = 0;
-    placement.position.y = 0;
-    placement.direction = CDirection::NORTH;
-    m_placeCommand.SetPlacement(placement);
-
-    // place
-    CCommandApplyResult result = robot.ApplyCommand(&m_placeCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    EXPECT_TRUE(robot.IsPlaced());
-
-    // left
-    result = robot.ApplyCommand(&m_rotateLeftCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 0, 0);
-    AssertRobotDirection(&robot, CDirection::WEST);
-}
-
-/*! @brief Test robot test case 3
-*/
-TEST( TestRobot, Test_Robot_Place_1_2_East_Move_Move_Left_Move)
-{
-    CTable table(5, 5);
-    CRobot robot(&table);
-    stPlacement placement;
-    CCommand m_placeCommand;
-    CTestMoveCommand m_moveCommand;
-    CTestLeftCommand m_rotateLeftCommand;
-
-    placement.position.x = 1;
-    placement.position.y = 2;
-    placement.direction = CDirection::EAST;
-    m_placeCommand.SetPlacement(placement);
-
-    // place
-    CCommandApplyResult result = robot.ApplyCommand(&m_placeCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    EXPECT_TRUE(robot.IsPlaced());
-
-    // move
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 2, 2);
-    AssertRobotDirection(&robot, CDirection::EAST);
-
-    // move
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 3, 2);
-    AssertRobotDirection(&robot, CDirection::EAST);
-
-    // left
-    result = robot.ApplyCommand(&m_rotateLeftCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 3, 2);
-    AssertRobotDirection(&robot, CDirection::NORTH);
-
-    // move
-    result = robot.ApplyCommand(&m_moveCommand);
-    EXPECT_EQ(
-        static_cast<int>(CCommandApplyResult::OK),
-        static_cast<int>(result));
-    AssertRobotPosition(&robot, 3, 3);
-    AssertRobotDirection(&robot, CDirection::NORTH);
+	return testHashMap.GetTestCount();
 }

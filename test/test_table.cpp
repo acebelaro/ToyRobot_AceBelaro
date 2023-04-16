@@ -4,120 +4,82 @@
 */
 //******************************************************************************
 
-#include "gtest/gtest.h"
+#include "test_toyRobot.hpp"
 #include "table.hpp"
-#include "test_helper.h"
 
-//******************************************************************************
-//               Private function declaration
-//******************************************************************************
-
-/*
-* @brief Test helper to assert thrown TableInvalidSizeException
-* @param width
-* @param height
-*/
-static void AssertTableExceptionForInvalidSize(int width, int height);
-
-//******************************************************************************
-//               Private function definition
-//******************************************************************************
-
-static void AssertTableExceptionForInvalidSize(int width, int height)
+static void test_dimensionGet()
 {
-    bool exceptionThrown = false;
-    try
-    {
-        CTable table(width, height);
-    }
-    catch (TableInvalidSizeException& e)
-    {
-        exceptionThrown = true;
-        EXPECT_EQUAL_CONST_CHAR_STRING( "Unable to create size with non-positive width and/or height", e.what() );
-    }
-    EXPECT_TRUE(exceptionThrown);
-}
-
-//******************************************************************************
-//               Test functions
-//******************************************************************************
-
-/*! @brief Test table construction with valid dimension
-*/
-TEST( TestTable, Test_TableInitialisationWithValidDimension )
-{
-    CTable table(5, 10);
+    Table table(5, 10);
 
     // Test
-    EXPECT_EQ(5, table.GetWidth());
-    EXPECT_EQ(10, table.GetHeight());
+	assert( table.GetWidth() == 5 );
+	assert( table.GetHeight() == 10 );
 }
 
-/*! @brief Test table construction with invalid dimension
-*/
-TEST( TestTable, Test_TableInitialisationWithInvalidDimension )
+static void test_coordinatesWithinBounds()
 {
-    AssertTableExceptionForInvalidSize(-1, 5);
-    AssertTableExceptionForInvalidSize(5, -1);
-    AssertTableExceptionForInvalidSize(-1, -1);
-};
+    Table table(5, 10);
 
-/*! @brief Test table when checking for allowed position
-*/
-TEST( TestTable, Test_AllowedPositionChecking )
-{
-    CTable table(5, 10);
-
-    stPosition testPosition;
+    Coordinate coordinate(0,0);
     
     // zero
-    testPosition.x = 0;
-    testPosition.y = 0;
-    EXPECT_TRUE(table.IsPositionAllowed(&testPosition));
+	coordinate.SetX(0);
+	coordinate.SetY(0);
+    assert( table.IsCoordinatesWithinBounds(coordinate) );
 
     // non-edge positions
-    testPosition.x = 1;
-    testPosition.y = 3;
-    EXPECT_TRUE(table.IsPositionAllowed(&testPosition));
+	coordinate.SetX(1);
+	coordinate.SetY(3);
+    assert( table.IsCoordinatesWithinBounds(coordinate) );
 
     // max x, y
-    testPosition.x = 4;
-    testPosition.y = 9;
-    EXPECT_TRUE(table.IsPositionAllowed(&testPosition));
+	coordinate.SetX(4);
+	coordinate.SetY(9);
+    assert( table.IsCoordinatesWithinBounds(coordinate) );
 }
 
-/*! @brief Test table when checking for not allowed position
-*/
-TEST( TestTable, Test_NotAllowedPositionChecking )
+static void test_coordinatesOutsideBounds()
 {
-    CTable table(5, 10);
+    Table table(5, 10);
 
-    stPosition testPosition;
+    Coordinate coordinate(0,0);
 
     // invalid x
-    testPosition.x = 5;
-    testPosition.y = 3;
-    EXPECT_FALSE(table.IsPositionAllowed(&testPosition));
+	coordinate.SetX(5);
+	coordinate.SetY(3);
+    assert( table.IsCoordinatesWithinBounds(coordinate) == false );
 
-    testPosition.x = -1;
-    testPosition.y = 3;
-    EXPECT_FALSE(table.IsPositionAllowed(&testPosition));
+	coordinate.SetX(-1);
+	coordinate.SetY(3);
+    assert( table.IsCoordinatesWithinBounds(coordinate) == false );
 
     // invalid y
-    testPosition.x = 1;
-    testPosition.y = 10;
-    EXPECT_FALSE(table.IsPositionAllowed(&testPosition));
+	coordinate.SetX(1);
+	coordinate.SetY(10);
+    assert( table.IsCoordinatesWithinBounds(coordinate) == false );
 
-    testPosition.x = 1;
-    testPosition.y = -1;
-    EXPECT_FALSE(table.IsPositionAllowed(&testPosition));
+	coordinate.SetX(1);
+	coordinate.SetY(-1);
+    assert( table.IsCoordinatesWithinBounds(coordinate) == false );
 
     // invalid x and y
-    testPosition.x = 5;
-    testPosition.y = 10;
-    EXPECT_FALSE(table.IsPositionAllowed(&testPosition));
+	coordinate.SetX(5);
+	coordinate.SetY(10);
+    assert( table.IsCoordinatesWithinBounds(coordinate) == false );
 
-    testPosition.x = -1;
-    testPosition.y = -1;
-    EXPECT_FALSE(table.IsPositionAllowed(&testPosition));
+	coordinate.SetX(-1);
+	coordinate.SetY(-1);
+    assert( table.IsCoordinatesWithinBounds(coordinate) == false );
+}
+
+int testTable()
+{
+	TestHashMap testHashMap("Table");
+	testHashMap.AddTest("Test dimension get", test_dimensionGet);
+	testHashMap.AddTest("Test coordinates within bounds", test_coordinatesWithinBounds);
+	testHashMap.AddTest("Test coordinates outside bounds", test_coordinatesOutsideBounds);
+
+	testHashMap.ExecuteTests();
+
+	return testHashMap.GetTestCount();
 }
