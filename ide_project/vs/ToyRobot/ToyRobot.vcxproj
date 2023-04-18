@@ -19,22 +19,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\source\command.cpp" />
+    <ClCompile Include="..\..\..\app\ToyRobotApp.cpp" />
     <ClCompile Include="..\..\..\source\command_parser.cpp" />
+    <ClCompile Include="..\..\..\source\coordinate.cpp" />
+    <ClCompile Include="..\..\..\source\direction.cpp" />
     <ClCompile Include="..\..\..\source\robot.cpp" />
+    <ClCompile Include="..\..\..\source\RobotPosition.cpp" />
     <ClCompile Include="..\..\..\source\table.cpp" />
-    <ClCompile Include="..\..\..\source\util.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\source\command.hpp" />
-    <ClInclude Include="..\..\..\source\command_if.hpp" />
-    <ClInclude Include="..\..\..\source\command_parser.hpp" />
-    <ClInclude Include="..\..\..\source\command_parser_if.hpp" />
-    <ClInclude Include="..\..\..\source\robot.hpp" />
-    <ClInclude Include="..\..\..\source\robot_if.hpp" />
-    <ClInclude Include="..\..\..\source\table.hpp" />
-    <ClInclude Include="..\..\..\source\table_if.hpp" />
-    <ClInclude Include="..\..\..\source\util.hpp" />
+    <ClInclude Include="..\..\..\app\ToyRobotApp.hpp" />
+    <ClInclude Include="..\..\..\include\command_parser.hpp" />
+    <ClInclude Include="..\..\..\include\coordinate.hpp" />
+    <ClInclude Include="..\..\..\include\direction.hpp" />
+    <ClInclude Include="..\..\..\include\robot.hpp" />
+    <ClInclude Include="..\..\..\include\RobotPosition.hpp" />
+    <ClInclude Include="..\..\..\include\table.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -58,7 +58,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -96,9 +96,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)..\..\..\include\</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)..\..\..\include\</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

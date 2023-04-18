@@ -1,48 +1,4 @@
 @startuml
-class CGame{
-- CTable table
-- CRobot robot
-- CCommandParser commandParser
-+void Play()
-}
-class CTable{
-- int width
-- int height
-+ bool IsPositionAllowed(stPosition)
-}
-class CRobot{
-- CTable table
-- bool isPlaced
-- CDirection direction
-- stPosition m_position
-- bool Move()
-- void Rotate()
-+ CCommandApplyResult ApplyCommand(CCommand)
-}
-class CCommand{
-- bool isPlace
-- stPlacement placement
-- bool isMove
-- CRotate rotate
-- bool doReport
-}
-class CCommandParser{
-- tCommandParserMap m_commandParserMap
-- stCommandParseParam ParseCommandParam(string)
-- CCommand ParsePlaceCommand(stCommandParseParam)
-- CCommand ParseMoveCommand(stCommandParseParam)
-- CCommand ParseLeftCommand(stCommandParseParam)
-- CCommand ParseRightCommand(stCommandParseParam)
-- CCommand ParseReportCommand(stCommandParseParam)
-+ CCommand ParseCommand(string)
-}
 
-CRobot - CTable : placed in >
-CCommandParser -- CCommand : parses >
-CCommand - CRobot : applies >
-
-CGame -- CTable : owns >
-CGame -- CRobot : owns >
-CGame -- CCommandParser : owns >
 
 @enduml

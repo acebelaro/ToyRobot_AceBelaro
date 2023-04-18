@@ -5,73 +5,40 @@
 //******************************************************************************
 #pragma once
 
-#include "command_parser_if.hpp"
+
+#include <regex>
+#include <functional>
+#include <map>
+#include <iostream>
+
+#include "robot.hpp"
+#include "table.hpp"
+
+using namespace std;
+
+typedef function<void (const smatch & match)> tCommandExecuteFunction;
+
+typedef map<string,tCommandExecuteFunction> tCommandRegexExecutionFunctionMap;
 
 //******************************************************************************
 //               Public definitions
 //******************************************************************************
 
 /* Command Parser class */
-class CCommandParser {
-public:
-	/**
-	* @brief Command parser constructor
-	*/
-	CCommandParser();
-	/**
-	* @brief Command parser deconstructor
-	*/
-	~CCommandParser();
-private:
-	tCommandParserMap m_commandParserMap;	/* command name to parser map */
-	/**
-	* @brief Parses input to create command parameter
-	* @param str	- input string
-	* @return command parser parameter
-	*/
-	stCommandParseParam ParseCommandParam(std::string);
-	/*
-	* @brief Parser for PLACE command
-	* @param params		- command parser function parameter
-	* @return			- PLACE command (NULL if error)
-	*/
-	static CCommand* ParsePlaceCommand(tCommandParserFuncParam);
-	/*
-	* @brief Parser for MOVE command
-	* @param params		- command parser function parameter
-	* @return			- MOVE command (NULL if error)
-	*/
-	static CCommand* ParseMoveCommand(tCommandParserFuncParam);
+class CommandParser
+{
+	public:
+		CommandParser(Robot&,Table&);
+		~CommandParser() = default;
 
-	/*
-	* @brief Parser for LEFT command
-	* @param params		- command parser function parameter
-	* @return			- LEFT command (NULL if error)
-	*/
-	static CCommand* ParseLeftCommand(tCommandParserFuncParam);
+	private:
+		Robot & _robot;
+		Table & _table;
 
-	/*
-	* @brief Parser for RIGHT command
-	* @param params		- command parser function parameter
-	* @return			- RIGHT command (NULL if error)
-	*/
-	static CCommand* ParseRightCommand(tCommandParserFuncParam);
-
-	/*
-	* @brief Parser for REPORT command
-	* @param params		- command parser function parameter
-	* @return			- REPORT command (NULL if error)
-	*/
-	static CCommand* ParseReportCommand(tCommandParserFuncParam);
-public:
-	/**
-	* @brief Parser command input string to create command
-	* @param str	- input string
-	* @return command (NULL if error)
-	* @exception	InvalidCommandException					- if command is not found
-	* @exception	InvalidParameterCountException			- when command has invalid parameter count
-	* @exception	InvalidCommandParameterValueException	- when command has invalid parameter
-	* @exception	UnexpectedCommandParameterException		- when command has unexpected parameter
-	*/
-	CCommand* ParseCommand(std::string);
+	private:
+		tCommandRegexExecutionFunctionMap _commandRegexFunctionMap;
+		void createCommands();
+		
+	public:
+		bool parseCommand(string strCommand);
 };

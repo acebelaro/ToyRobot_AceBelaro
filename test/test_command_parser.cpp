@@ -4,327 +4,287 @@
 */
 //******************************************************************************
 
-#include "gtest/gtest.h"
+#include "test_toyRobot.hpp"
 #include "command_parser.hpp"
-#include "test_helper.h"
+#include <sstream>
 
-//******************************************************************************
-//               Private function declaration
-//******************************************************************************
+#define ASSERT_ROBOT_INIT_STATE( robot ) assertRobot( robot, false, 0, 0, Direction::NORTH )
 
-/*
-* @brief Test helper to assert PLACE command
-* @param command
-* @param x
-* @param y
-* @param direction
-*/
-void AssertPlacement(CCommand* command, int x, int y, CDirection direction);
-
-/*
-* @brief Test helper to assert PLACE command is initial state
-* @param command
-*/
-void AssertPlacementIsInitState(CCommand* command);
-
-/*
-* @brief Test helper to assert parser throws InvalidCommandException
-* @param str
-* @param commandName
-*/
-void AssertParserThrowsInvalidCommandException(std::string str, std::string commandName);
-
-/*
-* @brief Test helper to assert parser throws InvalidParameterCountException
-* @param str
-* @param parameters
-*/
-void AssertParserThrowsInvalidInvalidParameterCountException(std::string str, std::string parameters);
-
-/*
-* @brief Test helper to assert parser throws InvalidCommandParameterValueException
-* @param str
-* @param param
-* @param value
-*/
-void AssertParserThrowsInvalidCommandParameterValueException(std::string str, std::string param, std::string value);
-
-/*
-* @brief Test helper to assert parser throws UnexpectedCommandParameterException
-* @param str
-*/
-void AssertParserThrowsUnexpectedCommandParameterException(std::string str);
-
-//******************************************************************************
-//               Private function definition
-//******************************************************************************
-
-void AssertPlacement(CCommand* command, int x, int y, CDirection direction) {
-	stPlacement placement = command->GetPlacement();
-	EXPECT_EQ(static_cast<int>(direction),
-		static_cast<int>(placement.direction));
-	EXPECT_EQ(x, placement.position.x);
-	EXPECT_EQ(y, placement.position.y);
-}
-
-void AssertPlacementIsInitState(CCommand* command) {
-	AssertPlacement(command, INIT_X_POS, INIT_Y_POS, INIT_PLACEMENT_DIRECTION);
-}
-
-void AssertParserThrowsInvalidCommandException(std::string str, std::string commandName)
+static void assertRobot( 
+	Robot & robot,
+	bool expected_isPlaced,
+	int expected_x,
+	int expected_y,
+	Direction expected_direction )
 {
-	bool exceptionThrown = false;
-	try
-	{
-		CCommandParser commandParser;
-
-		commandParser.ParseCommand(str);
-	}
-	catch (InvalidCommandException& e)
-	{
-		exceptionThrown = true;
-		EXPECT_EQ(std::string(e.what()), std::string("Invalid command : ") + commandName);
-	}
-	EXPECT_TRUE(exceptionThrown);
+	assert( robot.IsPlaced() == expected_isPlaced );
+	assert( robot.GetCoordinate().GetX() == expected_x );
+	assert( robot.GetCoordinate().GetY() == expected_y );
+	assert( robot.GetDirection() == expected_direction );
 }
 
-void AssertParserThrowsInvalidInvalidParameterCountException(std::string str, std::string parameters)
+static void test_placeCommand(
+	string command,
+	int expected_x,
+	int expected_y,
+	Direction expected_direction)
 {
-	bool exceptionThrown = false;
-	try
-	{
-		CCommandParser commandParser;
+	Robot robot;
+	Table table(5,5);
+	CommandParser commandParser( robot, table );
 
-		commandParser.ParseCommand(str);
-	}
-	catch (InvalidParameterCountException& e)
-	{
-		exceptionThrown = true;
-		EXPECT_EQ(std::string(e.what()), std::string("Invalid number of parameters : ") + parameters);
-	}
-	EXPECT_TRUE(exceptionThrown);
+	bool res = commandParser.parseCommand( command );
+	assert( res );
+	assertRobot( robot, true, expected_x, expected_y, expected_direction );
 }
 
-void AssertParserThrowsInvalidCommandParameterValueException(std::string str, std::string param, std::string value)
+static void test_validPlaceCommandsWithCoordinatesWithinBounds()
 {
-	bool exceptionThrown = false;
-	try
-	{
-		CCommandParser commandParser;
-
-		commandParser.ParseCommand(str);
-	}
-	catch (InvalidCommandParameterValueException& e)
-	{
-		exceptionThrown = true;
-		EXPECT_EQ(std::string(e.what()), std::string("Invalid parameter value : ") + param + std::string(" = ") + value);
-	}
-	EXPECT_TRUE(exceptionThrown);
+	test_placeCommand( "PLACE 0,0,SOUTH", 0, 0, Direction::SOUTH );
+	test_placeCommand( "PLACE 4,4,NORTH", 4, 4, Direction::NORTH );
+	test_placeCommand( "PLACE 0,4,WEST", 0, 4, Direction::WEST );
+	test_placeCommand( "PLACE 4,0,EAST", 4, 0, Direction::EAST );
 }
 
-void AssertParserThrowsUnexpectedCommandParameterException(std::string str)
+static void test_validPlaceCommandsWithCoordinatesOutsideBounds()
 {
-	bool exceptionThrown = false;
-	try
-	{
-		CCommandParser commandParser;
+	Robot robot;
+	Table table(5,5);
+	CommandParser commandParser( robot, table );
+	bool res;
 
-		commandParser.ParseCommand(str);
-	}
-	catch (UnexpectedCommandParameterException& e)
-	{
-		exceptionThrown = true;
-		EXPECT_EQ(std::string(e.what()), std::string("Unexpected command parameter"));
-	}
-	EXPECT_TRUE(exceptionThrown);
+	res = commandParser.parseCommand("PLACE 5,0,NORTH");
+	assert( res );
+	ASSERT_ROBOT_INIT_STATE( robot );
+
+	res = commandParser.parseCommand("PLACE 0,5,NORTH");
+	assert( res );
+	ASSERT_ROBOT_INIT_STATE( robot );
 }
 
-//******************************************************************************
-//               Test functions
-//******************************************************************************
-
-/*! @brief Test parser throws exception when command is not valid
-*/
-TEST( TestCommandParser, Test_ParseCommandReturnsNullForInvalidInput)
+static void test_validPlaceCommandsWithInvalidParameters()
 {
-	AssertParserThrowsInvalidCommandException("mOve 100", "mOve");
+	Robot robot;
+	Table table(5,5);
+	CommandParser commandParser( robot, table );
+	bool res;
 
-	AssertParserThrowsInvalidCommandException("!@#~", "!@#~");
+	res = commandParser.parseCommand("");
+	assert( res == false );
+	ASSERT_ROBOT_INIT_STATE( robot );
+
+	res = commandParser.parseCommand("PLACE x,0,NORTH");
+	assert( res == false );
+	ASSERT_ROBOT_INIT_STATE( robot );
+
+	res = commandParser.parseCommand("PLACE 0,x,NORTH");
+	assert( res == false );
+	ASSERT_ROBOT_INIT_STATE( robot );
+
+	res = commandParser.parseCommand("PLACE 0,0,NORTH?");
+	assert( res == false );
+	ASSERT_ROBOT_INIT_STATE( robot );
 }
 
-/*! @brief Test parser returns PLACE command
-*/
-TEST( TestCommandParser, Test_ParseCommandReturnsPlaceCommand)
+static void test_validMoveCommands()
 {
-	CCommandParser commandParser;
-	CCommand* command;
+	Robot robot;
+	Table table(5,5);
+	CommandParser commandParser( robot, table );
+	bool res;
 
-	command = commandParser.ParseCommand("PLACE 4,1,NORTH");
-	EXPECT_IS_NOT_NULL(command);
-	EXPECT_EQ(true, command->IsPlace());
-	AssertPlacement(command, 4, 1, CDirection::NORTH);
-	EXPECT_EQ(false, command->IsMove());
-	EXPECT_EQ(static_cast<int>(CRotate::NONE), 
-		static_cast<int>(command->GetRotate()));
-	EXPECT_EQ(false, command->DoReport());
+	// test initialization
+	assert(commandParser.parseCommand( "PLACE 0,0,NORTH" ));
+	assertRobot( robot, true, 0, 0, Direction::NORTH );
 
-	delete command;
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 0, 1, Direction::NORTH );
 
-	command = commandParser.ParseCommand("PLACE 1,2,EAST");
-	EXPECT_IS_NOT_NULL(command);
-	EXPECT_EQ(true, command->IsPlace());
-	AssertPlacement(command, 1, 2, CDirection::EAST);
-	EXPECT_EQ(false, command->IsMove());
-	EXPECT_EQ(static_cast<int>(CRotate::NONE),
-		static_cast<int>(command->GetRotate()));
-	EXPECT_EQ(false, command->DoReport());
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 0, 2, Direction::NORTH );
 
-	delete command;
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 0, 3, Direction::NORTH );
 
-	command = commandParser.ParseCommand("PLACE 0,0,SOUTH");
-	EXPECT_IS_NOT_NULL(command);
-	EXPECT_EQ(true, command->IsPlace());
-	AssertPlacement(command, 0, 0, CDirection::SOUTH);
-	EXPECT_EQ(false, command->IsMove());
-	EXPECT_EQ(static_cast<int>(CRotate::NONE),
-		static_cast<int>(command->GetRotate()));
-	EXPECT_EQ(false, command->DoReport());
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 0, 4, Direction::NORTH );
 
-	delete command;
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 0, 4, Direction::NORTH );
 
-	command = commandParser.ParseCommand("PLACE 3,2,WEST");
-	EXPECT_IS_NOT_NULL(command);
-	EXPECT_EQ(true, command->IsPlace());
-	AssertPlacement(command, 3, 2, CDirection::WEST);
-	EXPECT_EQ(false, command->IsMove());
-	EXPECT_EQ(static_cast<int>(CRotate::NONE),
-		static_cast<int>(command->GetRotate()));
-	EXPECT_EQ(false, command->DoReport());
+	// test initialization
+	assert(commandParser.parseCommand( "PLACE 0,0,EAST" ));
+	assertRobot( robot, true, 0, 0, Direction::EAST );
 
-	delete command;
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 1, 0, Direction::EAST );
+
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 2, 0, Direction::EAST );
+
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 3, 0, Direction::EAST );
+
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 4, 0, Direction::EAST );
+
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 4, 0, Direction::EAST );
+
+	// test initialization
+	assert(commandParser.parseCommand( "PLACE 4,0,WEST" ));
+	assertRobot( robot, true, 4, 0, Direction::WEST );
+
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 3, 0, Direction::WEST );
+
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 2, 0, Direction::WEST );
+
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 1, 0, Direction::WEST );
+
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 0, 0, Direction::WEST );
+
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 0, 0, Direction::WEST );
+
+	// test initialization
+	assert(commandParser.parseCommand( "PLACE 0,4,SOUTH" ));
+	assertRobot( robot, true, 0, 4, Direction::SOUTH );
+
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 0, 3, Direction::SOUTH );
+
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 0, 2, Direction::SOUTH );
+
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 0, 1, Direction::SOUTH );
+
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 0, 0, Direction::SOUTH );
+
+	res = commandParser.parseCommand( "MOVE" );
+	assert( res );
+	assertRobot( robot, true, 0, 0, Direction::SOUTH );
 }
 
-/*! @brief Test parser throws exception when PLACE command has invalid parameters
-*/
-TEST( TestCommandParser, Test_ParseCommandReturnsNullIfPlaceCommandHasInvalidParameter)
+static void test_validLeft()
 {
-	// missing parameter
-	AssertParserThrowsInvalidInvalidParameterCountException("PLACE", "X,Y,F");
-	AssertParserThrowsInvalidInvalidParameterCountException("PLACE 4", "X,Y,F");
-	AssertParserThrowsInvalidInvalidParameterCountException("PLACE EAST", "X,Y,F");
-	AssertParserThrowsInvalidInvalidParameterCountException("PLACE 4,1", "X,Y,F");
-	AssertParserThrowsInvalidInvalidParameterCountException("PLACE 4,NORTH", "X,Y,F");
-	AssertParserThrowsInvalidInvalidParameterCountException("PLACE 1,1,", "X,Y,F");
+	Robot robot;
+	Table table(5,5);
+	CommandParser commandParser( robot, table );
+	bool res;
 
-	// invalid parameter value
-	AssertParserThrowsInvalidCommandParameterValueException("PLACE ,1,NORTH", "X", "");
-	AssertParserThrowsInvalidCommandParameterValueException("PLACE 4,,NORTH", "Y", "");
-	AssertParserThrowsInvalidCommandParameterValueException("PLACE -1,1,NORTH", "X", "-1");
-	AssertParserThrowsInvalidCommandParameterValueException("PLACE 4,-1,NORTH", "Y", "-1");
-	AssertParserThrowsInvalidCommandParameterValueException("PLACE 1,1,NORtH", "F", "NORtH");
+	// test initialization
+	assert(commandParser.parseCommand( "PLACE 0,0,NORTH" ));
+	assertRobot( robot, true, 0, 0, Direction::NORTH );
+
+	res = commandParser.parseCommand( "LEFT" );
+	assert( res );
+	assertRobot( robot, true, 0, 0, Direction::WEST );
+
+	res = commandParser.parseCommand( "LEFT" );
+	assert( res );
+	assertRobot( robot, true, 0, 0, Direction::SOUTH );
+
+	res = commandParser.parseCommand( "LEFT" );
+	assert( res );
+	assertRobot( robot, true, 0, 0, Direction::EAST );
+
+	res = commandParser.parseCommand( "LEFT" );
+	assert( res );
+	assertRobot( robot, true, 0, 0, Direction::NORTH );
 }
 
-/*! @brief Test parser returns MOVE command
-*/
-TEST( TestCommandParser, Test_ParseCommandReturnsMoveCommand)
+static void test_validRight()
 {
-	CCommandParser commandParser;
-	CCommand* command;
+	Robot robot;
+	Table table(5,5);
+	CommandParser commandParser( robot, table );
+	bool res;
 
-	command = commandParser.ParseCommand("MOVE");
-	EXPECT_IS_NOT_NULL(command);
-	EXPECT_EQ(false, command->IsPlace());
-	AssertPlacementIsInitState(command);
-	EXPECT_EQ(true, command->IsMove());
-	EXPECT_EQ(static_cast<int>(CRotate::NONE), static_cast<int>(command->GetRotate()));
-	EXPECT_EQ(false, command->DoReport());
+	// test initialization
+	assert(commandParser.parseCommand( "PLACE 0,0,NORTH" ));
+	assertRobot( robot, true, 0, 0, Direction::NORTH );
 
-	delete command;
+	res = commandParser.parseCommand( "RIGHT" );
+	assert( res );
+	assertRobot( robot, true, 0, 0, Direction::EAST );
+
+	res = commandParser.parseCommand( "RIGHT" );
+	assert( res );
+	assertRobot( robot, true, 0, 0, Direction::SOUTH );
+
+	res = commandParser.parseCommand( "RIGHT" );
+	assert( res );
+	assertRobot( robot, true, 0, 0, Direction::WEST );
+
+	res = commandParser.parseCommand( "RIGHT" );
+	assert( res );
+	assertRobot( robot, true, 0, 0, Direction::NORTH );
 }
 
-/*! @brief Test parser throws exception when MOVE command has parameter
-*/
-TEST( TestCommandParser, Test_ParseCommandReturnsNullIfMoveCommandHasParameter)
+static void test_validReport()
 {
-	AssertParserThrowsUnexpectedCommandParameterException("MOVE x");
-	AssertParserThrowsUnexpectedCommandParameterException("MOVE 1");
+	Robot robot;
+	Table table(5,5);
+	CommandParser commandParser( robot, table );
+	bool res;
+
+	ostringstream strCout;
+	streambuf* stream_buffer_cout;
+    
+	// test initialization
+	assert(commandParser.parseCommand( "PLACE 0,0,NORTH" ));
+	assertRobot( robot, true, 0, 0, Direction::NORTH );
+
+	// redirect output
+	stream_buffer_cout = cout.rdbuf();
+	cout.rdbuf(strCout.rdbuf());
+
+	strCout.clear();
+	res = commandParser.parseCommand( "REPORT" );
+	assert( res );
+	assertRobot( robot, true, 0, 0, Direction::NORTH );
+	assert( strCout.str().compare("Output : 0,0,NORTH\n") == 0 );
+
+	// redirect output to original
+	cout.rdbuf(stream_buffer_cout);
 }
 
-/*! @brief Test parser returns LEFT command
-*/
-TEST( TestCommandParser, Test_ParseCommandReturnsLeftCommand)
+int testCommandParser()
 {
-	CCommandParser commandParser;
-	CCommand* command;
+	TestHashMap testHashMap("Command Parser");
+	testHashMap.AddTest("Test valid PLACE commands with coordinates within bounds", test_validPlaceCommandsWithCoordinatesWithinBounds);
+	testHashMap.AddTest("Test valid PLACE commands with coordinates outside bounds", test_validPlaceCommandsWithCoordinatesOutsideBounds);
+	testHashMap.AddTest("Test valid PLACE commands invalid parameters", test_validPlaceCommandsWithInvalidParameters);
+	testHashMap.AddTest("Test valid MOVE commands", test_validMoveCommands);
+	testHashMap.AddTest("Test valid LEFT commands", test_validLeft);
+	testHashMap.AddTest("Test valid RIGHT commands", test_validRight);
+	testHashMap.AddTest("Test valid REPORT commands", test_validReport);
+	testHashMap.ExecuteTests();
 
-	command = commandParser.ParseCommand("LEFT");
-	EXPECT_IS_NOT_NULL(command);
-	EXPECT_EQ(false, command->IsPlace());
-	AssertPlacementIsInitState(command);
-	EXPECT_EQ(false, command->IsMove());
-	EXPECT_EQ(static_cast<int>(CRotate::LEFT), static_cast<int>(command->GetRotate()));
-	EXPECT_EQ(false, command->DoReport());
-
-	delete command;
-}
-
-/*! @brief Test parser throws exception when LEFT command has parameter
-*/
-TEST( TestCommandParser, Test_ParseCommandReturnsNullIfLeftCommandHasParameter)
-{
-	AssertParserThrowsUnexpectedCommandParameterException("LEFT x");
-	AssertParserThrowsUnexpectedCommandParameterException("LEFT 1");
-}
-
-/*! @brief Test parser returns RIGHT command
-*/
-TEST( TestCommandParser, Test_ParseCommandReturnsRightCommand)
-{
-	CCommandParser commandParser;
-	CCommand* command;
-
-	command = commandParser.ParseCommand("RIGHT");
-	EXPECT_IS_NOT_NULL(command);
-	EXPECT_EQ(false, command->IsPlace());
-	AssertPlacementIsInitState(command);
-	EXPECT_EQ(false, command->IsMove());
-	EXPECT_EQ(static_cast<int>(CRotate::RIGHT), static_cast<int>(command->GetRotate()));
-	EXPECT_EQ(false, command->DoReport());
-
-	delete command;
-}
-
-/*! @brief Test parser throws exception when RIGHT command has parameter
-*/
-TEST( TestCommandParser, Test_ParseCommandReturnsNullIfRightCommandHasParameter)
-{
-	AssertParserThrowsUnexpectedCommandParameterException("RIGHT x");
-	AssertParserThrowsUnexpectedCommandParameterException("RIGHT 1");
-}
-
-/*! @brief Test parser returns REPORT command
-*/
-TEST( TestCommandParser, Test_ParseCommandReturnsReportCommand)
-{
-	CCommandParser commandParser;
-	CCommand* command;
-
-	command = commandParser.ParseCommand("REPORT");
-	EXPECT_IS_NOT_NULL(command);
-	EXPECT_EQ(false, command->IsPlace());
-	AssertPlacementIsInitState(command);
-	EXPECT_EQ(false, command->IsMove());
-	EXPECT_EQ(static_cast<int>(CRotate::NONE), 
-		static_cast<int>(command->GetRotate()));
-	EXPECT_EQ(true, command->DoReport());
-
-	delete command;
-}
-
-/*! @brief Test parser throws exception when REPORT command has parameter
-*/
-TEST( TestCommandParser, Test_ParseCommandReturnsNullIfReportCommandHasParameter)
-{
-	AssertParserThrowsUnexpectedCommandParameterException("REPORT x");
-	AssertParserThrowsUnexpectedCommandParameterException("REPORT 1");
+	return testHashMap.GetTestCount();
 }

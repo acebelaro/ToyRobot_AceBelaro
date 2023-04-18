@@ -32,28 +32,36 @@
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir)..\..\..\include\</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)..\..\..\include\</IncludePath>
+  </PropertyGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="..\..\..\source\command_parser.cpp" />
+    <ClCompile Include="..\..\..\source\coordinate.cpp" />
+    <ClCompile Include="..\..\..\source\direction.cpp" />
+    <ClCompile Include="..\..\..\source\robot.cpp" />
+    <ClCompile Include="..\..\..\source\RobotPosition.cpp" />
+    <ClCompile Include="..\..\..\source\table.cpp" />
     <ClCompile Include="..\..\..\test\test_command_parser.cpp" />
+    <ClCompile Include="..\..\..\test\test_direction.cpp" />
     <ClCompile Include="..\..\..\test\test_robot.cpp" />
     <ClCompile Include="..\..\..\test\test_table.cpp" />
-    <ClCompile Include="..\..\..\test\test_util.cpp" />
+    <ClCompile Include="..\..\..\test\test_toyRobot.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\test\test_helper.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ToyRobot\ToyRobot.vcxproj">
-      <Project>{5b29ae1f-5506-48cc-af8b-6b16936d72b2}</Project>
-    </ProjectReference>
+    <ClInclude Include="..\..\..\include\command_parser.hpp" />
+    <ClInclude Include="..\..\..\include\coordinate.hpp" />
+    <ClInclude Include="..\..\..\include\direction.hpp" />
+    <ClInclude Include="..\..\..\include\robot.hpp" />
+    <ClInclude Include="..\..\..\include\RobotPosition.hpp" />
+    <ClInclude Include="..\..\..\include\table.hpp" />
+    <ClInclude Include="..\..\..\test\test_toyRobot.hpp" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.5\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets" Condition="Exists('..\packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.5\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets')" />
-  </ImportGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -121,6 +129,5 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.5\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.5\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets'))" />
   </Target>
 </Project>

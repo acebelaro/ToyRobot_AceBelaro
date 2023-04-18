@@ -5,44 +5,25 @@
 //******************************************************************************
 #pragma once
 
-#include "table_if.hpp"
+#include "coordinate.hpp"
 
 //******************************************************************************
 //               Public definitions
 //******************************************************************************
 
-/** Table class */
-class CTable {
+class Table {
 public:
-	/**
-	* @brief Table constructor
-	* @param width	- width of table
-	* @param height	- height of table
-	*/
-	CTable(int, int);
-	/**
-	* @brief Table deconstructor
-	*/
-	~CTable();
+	Table(int, int);
+	~Table() = default;
+
 private:
-	int m_width;	/* table width */
-	int m_height;	/* table height */
+	int _width;		/* table width */
+	int _height;	/* table height */
+
 public:
-	/**
-	* @brief Gets table width
-	* @return table width
-	*/
-	int GetWidth();
-	/**
-	* @brief Gets table height
-	* @return table height
-	*/
-	int GetHeight();
-	/**
-	* @brief Checks if position is allowed in table.
-	* @param position	- position to check in table
-	* @retval true		- position is allowed
-	* @retval false		- position is not allowed
-	*/
-	bool IsPositionAllowed(stPosition const*);
+	int GetWidth() const;
+	void SetWidth(int);
+	int GetHeight() const;
+	void SetHeight(int);
+	bool IsCoordinatesWithinBounds(const Coordinate&) const;
 };
