@@ -22,13 +22,13 @@ class TestHashMap
 	public:
 		TestHashMap(string);
 		~TestHashMap() = default;
-		void AddTest(string, tTestFunction);
+		void AddTest(string, const tTestFunction&);
 		void ExecuteTests();
 		uint8_t GetTestCount();
 	private:
 		string _testName;
 		vector<string> _tests; // for ordered keys
-		map<string,tTestFunction> _testMap;
+		map<string,const tTestFunction> _testMap;
 };
 
 int testCommandParser();

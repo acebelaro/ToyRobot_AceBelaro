@@ -7,14 +7,15 @@
 #include "test_toyRobot.hpp"
 #include "robot.hpp"
 
+#define ASSERT_ROBOT_INIT_STATE( robot )		assert(robot.IsPlaced() == false);\
+												assert(robot.GetCoordinate().GetX() == 0 );\
+												assert(robot.GetCoordinate().GetY() == 0 );\
+												assert(robot.GetDirection() == Direction::NORTH )
+
 static void test_robotInitialState()
 {
 	Robot robot;
-
-	assert(robot.IsPlaced() == false);
-	assert(robot.GetCoordinate().GetX() == 0 );
-	assert(robot.GetCoordinate().GetY() == 0 );
-	assert(robot.GetDirection() == Direction::NORTH );
+	ASSERT_ROBOT_INIT_STATE(robot);
 }
 
 static void test_robotPlaceWithinBounds()
@@ -135,7 +136,7 @@ static void test_robotPlaceOutsideBounds()
 	assert(robot.GetDirection() == Direction::NORTH );
 }
 
-static void test_robotRotateLeft()
+static void test_rotateLeftWhenRobotIsPlaced()
 {
 	Robot robot;
 	Table table(5,5);
@@ -173,7 +174,15 @@ static void test_robotRotateLeft()
 	assert(robot.GetDirection() == Direction::SOUTH );
 }
 
-static void test_robotRotateRight()
+static void test_rotateLeftWhenRobotIsNotYetPlaced()
+{
+	Robot robot;
+
+	robot.RotateLeft();
+	ASSERT_ROBOT_INIT_STATE(robot);
+}
+
+static void test_rotateRightWhenRobotIsPlaced()
 {
 	Robot robot;
 	Table table(5,5);
@@ -211,7 +220,15 @@ static void test_robotRotateRight()
 	assert(robot.GetDirection() == Direction::SOUTH );
 }
 
-static void test_robotMoveSouth()
+static void test_rotateRightWhenRobotIsNotYetPlaced()
+{
+	Robot robot;
+
+	robot.RotateRight();
+	ASSERT_ROBOT_INIT_STATE(robot);
+}
+
+static void test_moveToSouthWhenRobotIsPlaced()
 {
 	Robot robot;
 	Table table(5,5);
@@ -243,7 +260,7 @@ static void test_robotMoveSouth()
 	assert(robot.GetDirection() == Direction::SOUTH );
 }
 
-static void test_robotMoveNorth()
+static void test_moveToNorthWhenRobotIsPlaced()
 {
 	Robot robot;
 	Table table(5,5);
@@ -275,7 +292,7 @@ static void test_robotMoveNorth()
 	assert(robot.GetDirection() == Direction::NORTH );
 }
 
-static void test_robotMoveEast()
+static void test_moveToEastWhenRobotIsPlaced()
 {
 	Robot robot;
 	Table table(5,5);
@@ -313,7 +330,7 @@ static void test_robotMoveEast()
 	assert(robot.GetDirection() == Direction::EAST );
 }
 
-static void test_robotMoveWest()
+static void test_moveToWestWhenRobotIsPlaced()
 {
 	Robot robot;
 	Table table(5,5);
@@ -357,15 +374,22 @@ static void test_robotMoveWest()
 	assert(robot.GetDirection() == Direction::WEST );
 }
 
-static void test_robotReport()
+static void test_moveWhenRobotIsNotYetPlaced()
+{
+	Robot robot;
+	Table table(5,5);
+
+	robot.Move(table);
+	ASSERT_ROBOT_INIT_STATE(robot);
+}
+
+static void test_robotReportWhenRobotIsPlaced()
 {
 	Robot robot;
 	Table table(5,5);
 	Coordinate coordinate(1,2);
 	Direction direction = Direction::SOUTH;
 	RobotPosition robotPosition(coordinate,direction);
-
-	assert( robot.Report().compare("Robot not yet placed") == 0 );
 
 	robot.Place(robotPosition,table);
 	assert( robot.Report().compare("1,2,SOUTH") == 0 );
@@ -395,19 +419,30 @@ static void test_robotReport()
 	assert( robot.Report().compare("4,1,WEST") == 0 );
 }
 
+static void test_robotReportWhenRobotIsNotYetPlaced()
+{
+	Robot robot;
+
+	assert( robot.Report().compare("Robot not yet placed") == 0 );
+}
+
 int testRobot()
 {
 	TestHashMap testHashMap("Robot");
 	testHashMap.AddTest("Test robot initial state",test_robotInitialState);
 	testHashMap.AddTest("Test robot place within bounds",test_robotPlaceWithinBounds);
 	testHashMap.AddTest("Test robot place outside bounds",test_robotPlaceOutsideBounds);
-	testHashMap.AddTest("Test robot rotate left",test_robotRotateLeft);
-	testHashMap.AddTest("Test robot rotate right",test_robotRotateRight);
-	testHashMap.AddTest("Test robot rotate move south",test_robotMoveSouth);
-	testHashMap.AddTest("Test robot rotate move north",test_robotMoveNorth);
-	testHashMap.AddTest("Test robot rotate move east",test_robotMoveEast);
-	testHashMap.AddTest("Test robot rotate move west",test_robotMoveWest);
-	testHashMap.AddTest("Test robot rotate report",test_robotReport);
+	testHashMap.AddTest("Test rotate left when robot is placed",test_rotateLeftWhenRobotIsPlaced);
+	testHashMap.AddTest("Test rotate left when robot is not yet placed",test_rotateLeftWhenRobotIsNotYetPlaced);
+	testHashMap.AddTest("Test rotate right when robot is placed",test_rotateRightWhenRobotIsPlaced);
+	testHashMap.AddTest("Test rotate right when robot is not yet placed",test_rotateRightWhenRobotIsNotYetPlaced);
+	testHashMap.AddTest("Test move to south when robot is placed",test_moveToSouthWhenRobotIsPlaced);
+	testHashMap.AddTest("Test move to north when robot is placed",test_moveToNorthWhenRobotIsPlaced);
+	testHashMap.AddTest("Test move to east when robot is placed",test_moveToEastWhenRobotIsPlaced);
+	testHashMap.AddTest("Test move to west when robot is placed",test_moveToWestWhenRobotIsPlaced);
+	testHashMap.AddTest("Test move when robot is not yet placed",test_moveWhenRobotIsNotYetPlaced);
+	testHashMap.AddTest("Test report when robot is placed",test_robotReportWhenRobotIsPlaced);
+	testHashMap.AddTest("Test report when robot is not yet placed",test_robotReportWhenRobotIsNotYetPlaced);
 	testHashMap.ExecuteTests();
 
 	return testHashMap.GetTestCount();

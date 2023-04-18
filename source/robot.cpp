@@ -31,16 +31,13 @@ void Robot::RotateLeft()
 	if( nullptr != _position )
 	{
 		Direction direction = _position->GetDirection();
-		if (direction == Direction::NORTH)
+		int dirInt = static_cast<int>(direction) - 1;
+		if( dirInt < MIN_DIR )
 		{
-			// overflow
-			direction = Direction::WEST;
+			dirInt = MAX_DIR;
 		}
-		else {
-			// decrement since direction enum is defined to ascending values as clockwise
-			direction = static_cast<Direction>(static_cast<int>(direction) - 1);
-		}
-		_position->SetDirection(direction);
+		direction = static_cast<Direction>(dirInt);
+		_position->SetDirection(direction );
 	}
 }
 
@@ -49,16 +46,12 @@ void Robot::RotateRight()
 	if( nullptr != _position )
 	{
 		Direction direction = _position->GetDirection();
-		if (Direction::WEST == direction)
+		int dirInt = static_cast<int>(direction) + 1;
+		if( dirInt > MAX_DIR )
 		{
-			// overflow
-			direction = Direction::NORTH;
+			dirInt = MIN_DIR;
 		}
-		else
-		{
-			// increment since direction enum is defined to ascending values as clockwise
-			direction = static_cast<Direction>(static_cast<int>(direction) + 1);
-		}
+		direction = static_cast<Direction>(dirInt);
 		_position->SetDirection(direction);
 	}
 }

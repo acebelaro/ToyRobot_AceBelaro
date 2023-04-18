@@ -16,10 +16,10 @@ TestHashMap::TestHashMap(string testName):
 
 }
 
-void TestHashMap::AddTest(string test, tTestFunction testFunction)
+void TestHashMap::AddTest(string testDescription, const tTestFunction& testFunction)
 {
-	_tests.push_back(test); // ordered key
-	_testMap.insert(make_pair(test,testFunction));
+	_tests.push_back(testDescription); // ordered key
+	_testMap.insert(make_pair(testDescription,testFunction));
 }
 
 void TestHashMap::ExecuteTests()

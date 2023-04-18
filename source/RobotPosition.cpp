@@ -32,7 +32,7 @@ Direction RobotPosition::GetDirection() const
     return _direction;
 }
 
-void RobotPosition::SetDirection(Direction &direction)
+void RobotPosition::SetDirection(Direction direction)
 {
     _direction = direction;
 }

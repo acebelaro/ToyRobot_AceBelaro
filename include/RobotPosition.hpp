@@ -26,5 +26,5 @@ class RobotPosition
         const Coordinate& GetCoordinate() const;
         void SetCoordinate(Coordinate&);
         Direction GetDirection() const;
-        void SetDirection(Direction&);
+        void SetDirection(Direction);
 };

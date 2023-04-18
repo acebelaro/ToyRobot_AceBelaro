@@ -6,6 +6,7 @@
 
 #include "test_toyRobot.hpp"
 #include "command_parser.hpp"
+#include <sstream>
 
 #define ASSERT_ROBOT_INIT_STATE( robot ) assertRobot( robot, false, 0, 0, Direction::NORTH )
 
@@ -37,12 +38,52 @@ static void test_placeCommand(
 	assertRobot( robot, true, expected_x, expected_y, expected_direction );
 }
 
-static void test_validPlaceCommands()
+static void test_validPlaceCommandsWithCoordinatesWithinBounds()
 {
 	test_placeCommand( "PLACE 0,0,SOUTH", 0, 0, Direction::SOUTH );
 	test_placeCommand( "PLACE 4,4,NORTH", 4, 4, Direction::NORTH );
 	test_placeCommand( "PLACE 0,4,WEST", 0, 4, Direction::WEST );
 	test_placeCommand( "PLACE 4,0,EAST", 4, 0, Direction::EAST );
+}
+
+static void test_validPlaceCommandsWithCoordinatesOutsideBounds()
+{
+	Robot robot;
+	Table table(5,5);
+	CommandParser commandParser( robot, table );
+	bool res;
+
+	res = commandParser.parseCommand("PLACE 5,0,NORTH");
+	assert( res );
+	ASSERT_ROBOT_INIT_STATE( robot );
+
+	res = commandParser.parseCommand("PLACE 0,5,NORTH");
+	assert( res );
+	ASSERT_ROBOT_INIT_STATE( robot );
+}
+
+static void test_validPlaceCommandsWithInvalidParameters()
+{
+	Robot robot;
+	Table table(5,5);
+	CommandParser commandParser( robot, table );
+	bool res;
+
+	res = commandParser.parseCommand("");
+	assert( res == false );
+	ASSERT_ROBOT_INIT_STATE( robot );
+
+	res = commandParser.parseCommand("PLACE x,0,NORTH");
+	assert( res == false );
+	ASSERT_ROBOT_INIT_STATE( robot );
+
+	res = commandParser.parseCommand("PLACE 0,x,NORTH");
+	assert( res == false );
+	ASSERT_ROBOT_INIT_STATE( robot );
+
+	res = commandParser.parseCommand("PLACE 0,0,NORTH?");
+	assert( res == false );
+	ASSERT_ROBOT_INIT_STATE( robot );
 }
 
 static void test_validMoveCommands()
@@ -233,35 +274,16 @@ static void test_validReport()
 	cout.rdbuf(stream_buffer_cout);
 }
 
-static void test_invalidCommands()
-{
-	Robot robot;
-	Table table(5,5);
-	CommandParser commandParser( robot, table );
-	bool res;
-
-	res = commandParser.parseCommand("");
-	assert( res == false );
-	ASSERT_ROBOT_INIT_STATE( robot );
-
-	res = commandParser.parseCommand("PLACE 5,0,NORTH");
-	assert( res );
-	ASSERT_ROBOT_INIT_STATE( robot );
-
-	res = commandParser.parseCommand("PLACE 0,5,NORTH");
-	assert( res );
-	ASSERT_ROBOT_INIT_STATE( robot );
-}
-
 int testCommandParser()
 {
 	TestHashMap testHashMap("Command Parser");
-	testHashMap.AddTest("Test valid PLACE commands", test_validPlaceCommands);
+	testHashMap.AddTest("Test valid PLACE commands with coordinates within bounds", test_validPlaceCommandsWithCoordinatesWithinBounds);
+	testHashMap.AddTest("Test valid PLACE commands with coordinates outside bounds", test_validPlaceCommandsWithCoordinatesOutsideBounds);
+	testHashMap.AddTest("Test valid PLACE commands invalid parameters", test_validPlaceCommandsWithInvalidParameters);
 	testHashMap.AddTest("Test valid MOVE commands", test_validMoveCommands);
 	testHashMap.AddTest("Test valid LEFT commands", test_validLeft);
 	testHashMap.AddTest("Test valid RIGHT commands", test_validRight);
 	testHashMap.AddTest("Test valid REPORT commands", test_validReport);
-	testHashMap.AddTest("Test valid invalid commands", test_invalidCommands);
 	testHashMap.ExecuteTests();
 
 	return testHashMap.GetTestCount();
