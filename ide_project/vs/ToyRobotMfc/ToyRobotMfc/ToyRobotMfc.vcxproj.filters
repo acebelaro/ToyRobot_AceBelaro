@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="ToyRobotMfc.cpp" />
+    <ClCompile Include="ToyRobotMfcDlg.cpp" />
+    <ClCompile Include="..\..\..\..\source\command_parser.cpp">
+      <Filter>source\toy_robot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\coordinate.cpp">
+      <Filter>source\toy_robot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\direction.cpp">
+      <Filter>source\toy_robot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\robot.cpp">
+      <Filter>source\toy_robot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\RobotPosition.cpp">
+      <Filter>source\toy_robot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\table.cpp">
+      <Filter>source\toy_robot</Filter>
+    </ClCompile>
+    <ClCompile Include="Tile.cpp">
+      <Filter>source\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="Board.cpp">
+      <Filter>source\ui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="ToyRobotMfc.h" />
+    <ClInclude Include="ToyRobotMfcDlg.h" />
+    <ClInclude Include="..\..\..\..\include\command_parser.hpp">
+      <Filter>source\toy_robot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\coordinate.hpp">
+      <Filter>source\toy_robot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\direction.hpp">
+      <Filter>source\toy_robot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\robot.hpp">
+      <Filter>source\toy_robot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\RobotPosition.hpp">
+      <Filter>source\toy_robot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\table.hpp">
+      <Filter>source\toy_robot</Filter>
+    </ClInclude>
+    <ClInclude Include="Tile.h">
+      <Filter>source\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="Board.h">
+      <Filter>source\ui</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ToyRobotMfc.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\bitmap1.bmp" />
+    <Image Include="res\bitmap2.bmp" />
+    <Image Include="res\ToyRobotMfc.ico" />
+    <Image Include="resources\Robot_east.bmp">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Robot_north.bmp">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Robot_south.bmp">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="resources\Robot_west.bmp">
+      <Filter>resources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\ToyRobotMfc.rc2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="source">
+      <UniqueIdentifier>{5e1693a5-e015-4846-ba27-7d5761b5e3c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\toy_robot">
+      <UniqueIdentifier>{ab207641-455f-43e6-a7fd-6e467075a65f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{0ef8a298-7ed4-497a-8bb0-9b538892e78e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\ui">
+      <UniqueIdentifier>{7e800abc-75fb-4a3b-9d78-7dc7a1ae29f7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

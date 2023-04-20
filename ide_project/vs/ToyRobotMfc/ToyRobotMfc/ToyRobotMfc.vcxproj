@@ -231,7 +231,6 @@
     <Image Include="resources\Robot_west.bmp" />
     <Image Include="res\bitmap1.bmp" />
     <Image Include="res\bitmap2.bmp" />
-    <Image Include="res\icon1.ico" />
     <Image Include="res\ToyRobotMfc.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
