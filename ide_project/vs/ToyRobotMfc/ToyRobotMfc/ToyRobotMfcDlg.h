@@ -5,15 +5,16 @@
 #pragma once
 
 #include "command_parser.hpp"
+#include "Board.h"
 
-#define TABLE_SIZE 5
-#define TILE_SIZE 70
-
+// IO IDs
 enum
 {
-	EDIT_INPUT_COMMAND = 1000,
-	EDIT_OUTPUT
+	ID_COMMAND_INPUT = 1000,
+	ID_COMMAND_RESPONSE
 };
+
+#define TABLE_SIZE 5
 
 // CToyRobotMfcDlg dialog
 class CToyRobotMfcDlg : public CDialogEx
@@ -21,7 +22,6 @@ class CToyRobotMfcDlg : public CDialogEx
 // Construction
 public:
 	CToyRobotMfcDlg(CWnd* pParent = nullptr);	// standard constructor
-	~CToyRobotMfcDlg();
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_TOYROBOTMFC_DIALOG };
@@ -48,7 +48,7 @@ private:
 	CommandParser _commandParser;
 
 	// UI
-	vector<CStatic*> _tiles;
+	CBoard _board;
 	CEdit _edtCommandInput;
 	CEdit _edtCommandResponse;
 

@@ -9,6 +9,7 @@
 #include "afxdialogex.h"
 #include <sstream>
 #include <algorithm>
+#include <WinUser.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -22,18 +23,10 @@
 CToyRobotMfcDlg::CToyRobotMfcDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_TOYROBOTMFC_DIALOG, pParent),
 	_table(TABLE_SIZE, TABLE_SIZE),
-	_commandParser(_robot, _table)
+	_commandParser(_robot, _table),
+	_board(TABLE_SIZE)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-}
-
-CToyRobotMfcDlg::~CToyRobotMfcDlg()
-{
-	for (auto& tile : _tiles)
-	{
-		delete tile;
-	}
-	_tiles.clear();
 }
 
 void CToyRobotMfcDlg::DoDataExchange(CDataExchange* pDX)
@@ -58,29 +51,28 @@ BOOL CToyRobotMfcDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-	CSize tileSize(TILE_SIZE, TILE_SIZE);
-	for (int row = 0; row < TABLE_SIZE; row++)
-	{
-		for (int col = 0; col < TABLE_SIZE; col++)
-		{
-			CStatic* tile = new CStatic();
-			CPoint p(10+(row * TILE_SIZE), 10+(col * TILE_SIZE));
-			tile->Create(_T(""), WS_CHILD | WS_VISIBLE | SS_CENTER | WS_BORDER, CRect(p, tileSize), this);
-			_tiles.push_back(tile);
-		}
-	}
+	_board.Create(this);
+
+	int windowWidth = 10 + ((5 + TILE_SIZE) * TABLE_SIZE);
+
+	int editY = ((5 + TILE_SIZE) * TABLE_SIZE);
+	int edtWidth = windowWidth - 35;
 
 	_edtCommandInput.Create(
 		ES_MULTILINE | WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_NOHIDESEL,
-		CRect(CPoint(10, 380), CSize(350, 35)),
-		this, 
-		EDIT_INPUT_COMMAND);
+		CRect(CPoint(10, editY), CSize(edtWidth, 35)),
+		this,
+		ID_COMMAND_INPUT);
 
+	editY += 40;
 	_edtCommandResponse.Create(
-		ES_MULTILINE | WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_NOHIDESEL | ES_READONLY, 
-		CRect(CPoint(10, 420), CSize(350, 70)),
-		this, 
-		EDIT_OUTPUT);
+		ES_MULTILINE | WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_NOHIDESEL | ES_READONLY,
+		CRect(CPoint(10, editY), CSize(edtWidth, 70)),
+		this,
+		ID_COMMAND_RESPONSE);
+
+	int windowHeight = editY + 130;
+	SetWindowPos(NULL, 0, 0, windowWidth, windowHeight, SWP_NOMOVE | SWP_NOZORDER);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -171,6 +163,7 @@ void CToyRobotMfcDlg::ExecuteCommand()
 	stringstream response;
 	if (res)
 	{
+		_board.DisplayRobot(_robot);
 		string cmdParserResponse = strCout.str();
 		if (!cmdParserResponse.empty())
 		{

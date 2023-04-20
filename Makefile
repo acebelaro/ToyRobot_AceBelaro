@@ -54,8 +54,8 @@ ifeq ($(OS),Windows_NT)
 CLEAN_TARGET	= del ${TARGET}.exe
 CLEAN_TEST		= del ${TEST}.exe
 else
-CLEAN_TARGET	= del ${TARGET}.exe 
-CLEAN_TEST		= del ${TEST}.exe 
+CLEAN_TARGET	= rm ${TARGET}.out 
+CLEAN_TEST		= rm ${TEST}.out 
 endif
 
 clean:

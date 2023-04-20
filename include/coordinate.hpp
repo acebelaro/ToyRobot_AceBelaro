@@ -24,4 +24,5 @@ class Coordinate
         int GetY() const;
         void SetX(int);
         void SetY(int);
+        friend bool operator==(const Coordinate& lhs, const Coordinate& rhs);
 };

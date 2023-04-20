@@ -191,6 +191,8 @@
     <ClInclude Include="..\..\..\..\include\robot.hpp" />
     <ClInclude Include="..\..\..\..\include\RobotPosition.hpp" />
     <ClInclude Include="..\..\..\..\include\table.hpp" />
+    <ClInclude Include="Board.h" />
+    <ClInclude Include="Tile.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
@@ -205,6 +207,8 @@
     <ClCompile Include="..\..\..\..\source\robot.cpp" />
     <ClCompile Include="..\..\..\..\source\RobotPosition.cpp" />
     <ClCompile Include="..\..\..\..\source\table.cpp" />
+    <ClCompile Include="Board.cpp" />
+    <ClCompile Include="Tile.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -221,6 +225,13 @@
     <None Include="res\ToyRobotMfc.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="resources\Robot_east.bmp" />
+    <Image Include="resources\Robot_north.bmp" />
+    <Image Include="resources\Robot_south.bmp" />
+    <Image Include="resources\Robot_west.bmp" />
+    <Image Include="res\bitmap1.bmp" />
+    <Image Include="res\bitmap2.bmp" />
+    <Image Include="res\icon1.ico" />
     <Image Include="res\ToyRobotMfc.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -24,6 +24,10 @@ void Robot::Place(const RobotPosition& position, const Table& table)
 		m_isPlaced = true;
 		_position.reset(new RobotPosition(position));
 	}
+	else
+	{
+		cout << "Outside bounds!";
+	}
 }
 
 void Robot::RotateLeft()
@@ -41,7 +45,7 @@ void Robot::RotateLeft()
 	}
 	else
 	{		
-		cout << "Robot not yet placed";
+		cout << "Robot not yet placed!";
     }
 }
 
@@ -60,7 +64,7 @@ void Robot::RotateRight()
 	}
 	else
 	{		
-		cout << "Robot not yet placed";
+		cout << "Robot not yet placed!";
     }
 }
 
@@ -94,10 +98,14 @@ bool Robot::Move(const Table& table)
 			result = true;
 			_position->SetCoordinate(newCoordinate);
 		}
+		else
+		{
+			cout << "Robot falling off!";
+		}
 	}
 	else
 	{		
-		cout << "Robot not yet placed";
+		cout << "Robot not yet placed!";
     }
 
 	return result;
@@ -115,7 +123,7 @@ string Robot::Report() const
     }
 	else
 	{		
-		cout << "Robot not yet placed";
+		cout << "Robot not yet placed!";
     }
     return report;
 }
