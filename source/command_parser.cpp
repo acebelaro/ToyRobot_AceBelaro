@@ -66,8 +66,12 @@ void CommandParser::createCommands()
 		[&] (const smatch & match)
 		{
 			stringstream report;
-			report << "Output : " << _robot.Report();
-			cout << report.str() << endl;
+			string robotReport = _robot.Report();
+			if( robotReport.compare("") != 0 )
+			{
+				report << "Output : " << _robot.Report();
+				cout << report.str() << endl;
+			}			
 		}
 	));
 }

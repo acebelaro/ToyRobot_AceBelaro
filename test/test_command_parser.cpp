@@ -46,25 +46,37 @@ static void test_validPlaceCommandsWithCoordinatesWithinBounds()
 	test_placeCommand( "PLACE 4,0,EAST", 4, 0, Direction::EAST );
 }
 
-static void test_validPlaceCommandsWithCoordinatesOutsideBounds()
+static void assert_placeOutsideBounds(string placeCommand)
 {
 	Robot robot;
 	Table table(5,5);
 	CommandParser commandParser( robot, table );
 	bool res;
+	ostringstream strCout;
+	streambuf* stream_buffer_cout;
 
-	res = commandParser.parseCommand("PLACE 5,0,NORTH");
+	// redirect output
+	stream_buffer_cout = cout.rdbuf();
+	cout.rdbuf(strCout.rdbuf());
+
+	res = commandParser.parseCommand(placeCommand);
 	assert( res );
 	ASSERT_ROBOT_INIT_STATE( robot );
+	assert( strCout.str().compare("Outside bounds!") == 0 );
 
-	res = commandParser.parseCommand("PLACE 0,5,NORTH");
-	assert( res );
-	ASSERT_ROBOT_INIT_STATE( robot );
+	// redirect output to original
+	cout.rdbuf(stream_buffer_cout);
+}
+
+static void test_validPlaceCommandsWithCoordinatesOutsideBounds()
+{
+	assert_placeOutsideBounds("PLACE 5,0,NORTH");
+	assert_placeOutsideBounds("PLACE 0,5,NORTH");
 }
 
 static void test_validPlaceCommandsWithInvalidParameters()
 {
-	Robot robot;
+	Robot robot; 
 	Table table(5,5);
 	CommandParser commandParser( robot, table );
 	bool res;
@@ -113,10 +125,6 @@ static void test_validMoveCommands()
 	assert( res );
 	assertRobot( robot, true, 0, 4, Direction::NORTH );
 
-	res = commandParser.parseCommand( "MOVE" );
-	assert( res );
-	assertRobot( robot, true, 0, 4, Direction::NORTH );
-
 	// test initialization
 	assert(commandParser.parseCommand( "PLACE 0,0,EAST" ));
 	assertRobot( robot, true, 0, 0, Direction::EAST );
@@ -132,10 +140,6 @@ static void test_validMoveCommands()
 	res = commandParser.parseCommand( "MOVE" );
 	assert( res );
 	assertRobot( robot, true, 3, 0, Direction::EAST );
-
-	res = commandParser.parseCommand( "MOVE" );
-	assert( res );
-	assertRobot( robot, true, 4, 0, Direction::EAST );
 
 	res = commandParser.parseCommand( "MOVE" );
 	assert( res );
@@ -161,10 +165,6 @@ static void test_validMoveCommands()
 	assert( res );
 	assertRobot( robot, true, 0, 0, Direction::WEST );
 
-	res = commandParser.parseCommand( "MOVE" );
-	assert( res );
-	assertRobot( robot, true, 0, 0, Direction::WEST );
-
 	// test initialization
 	assert(commandParser.parseCommand( "PLACE 0,4,SOUTH" ));
 	assertRobot( robot, true, 0, 4, Direction::SOUTH );
@@ -184,10 +184,40 @@ static void test_validMoveCommands()
 	res = commandParser.parseCommand( "MOVE" );
 	assert( res );
 	assertRobot( robot, true, 0, 0, Direction::SOUTH );
+}
+
+static void assert_validMoveCommandsAndFallingOff(string placeDirection,int x,int y,Direction direction)
+{
+	Robot robot;
+	Table table(5,5);
+	CommandParser commandParser( robot, table );
+	bool res;
+	ostringstream strCout;
+	streambuf* stream_buffer_cout;
+
+	// redirect output
+	stream_buffer_cout = cout.rdbuf();
+	cout.rdbuf(strCout.rdbuf());
+
+	// test initialization
+	assert(commandParser.parseCommand( placeDirection ));
+	assertRobot( robot, true, x, y, direction );
 
 	res = commandParser.parseCommand( "MOVE" );
 	assert( res );
-	assertRobot( robot, true, 0, 0, Direction::SOUTH );
+	assertRobot( robot, true, x, y, direction );
+	assert( strCout.str().compare("Robot falling off!") == 0 );
+
+	// redirect output to original
+	cout.rdbuf(stream_buffer_cout);
+}
+
+static void test_validMoveCommandsAndFallingOff()
+{
+	assert_validMoveCommandsAndFallingOff( "PLACE 0,4,NORTH", 0, 4, Direction::NORTH );
+	assert_validMoveCommandsAndFallingOff( "PLACE 4,0,SOUTH", 4, 0, Direction::SOUTH );
+	assert_validMoveCommandsAndFallingOff( "PLACE 4,0,EAST", 4, 0, Direction::EAST );
+	assert_validMoveCommandsAndFallingOff( "PLACE 0,4,WEST", 0, 4, Direction::WEST );
 }
 
 static void test_validLeft()
@@ -280,7 +310,8 @@ int testCommandParser()
 	testHashMap.AddTest("Test valid PLACE commands with coordinates within bounds", test_validPlaceCommandsWithCoordinatesWithinBounds);
 	testHashMap.AddTest("Test valid PLACE commands with coordinates outside bounds", test_validPlaceCommandsWithCoordinatesOutsideBounds);
 	testHashMap.AddTest("Test valid PLACE commands invalid parameters", test_validPlaceCommandsWithInvalidParameters);
-	testHashMap.AddTest("Test valid MOVE commands", test_validMoveCommands);
+	testHashMap.AddTest("Test valid MOVE commands and within founds", test_validMoveCommands);
+	testHashMap.AddTest("Test valid MOVE commands and falling off", test_validMoveCommandsAndFallingOff);
 	testHashMap.AddTest("Test valid LEFT commands", test_validLeft);
 	testHashMap.AddTest("Test valid RIGHT commands", test_validRight);
 	testHashMap.AddTest("Test valid REPORT commands", test_validReport);
