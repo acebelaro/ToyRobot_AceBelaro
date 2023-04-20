@@ -14,6 +14,7 @@ public:
 	~CBoard();
 	void Create(CWnd*);
 	void DisplayRobot(const Robot&);
+	bool IsRobotTileClicked(UINT);
 private:
 	int _size;
 	vector<CTile*> _tiles;

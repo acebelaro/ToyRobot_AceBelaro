@@ -7,6 +7,7 @@
 #include "ToyRobotMfc.h"
 #include "ToyRobotMfcDlg.h"
 #include "afxdialogex.h"
+
 #include <sstream>
 #include <algorithm>
 #include <WinUser.h>
@@ -37,6 +38,7 @@ void CToyRobotMfcDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CToyRobotMfcDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_CONTROL_RANGE(BN_CLICKED, ID_TILE_BUTTON, ID_TILE_BUTTON+(TABLE_SIZE* TABLE_SIZE), &CToyRobotMfcDlg::OnBtnClickedTile)
 END_MESSAGE_MAP()
 
 
@@ -187,4 +189,13 @@ void CToyRobotMfcDlg::ExecuteCommand()
 
 	// clear command input
 	_edtCommandInput.SetWindowTextW(_T(""));
+}
+
+void CToyRobotMfcDlg::OnBtnClickedTile(UINT nID)
+{
+	if (_board.IsRobotTileClicked(nID))
+	{
+		_robot.Move(_table);
+		_board.DisplayRobot(_robot);
+	}
 }

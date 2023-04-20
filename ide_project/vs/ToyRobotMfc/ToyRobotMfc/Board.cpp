@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "resource.h"
 #include "Board.h"
+#include "id.h"
 
 static map<Direction, int> directionBitMapMap = {
 	{Direction::NORTH,IDB_ROBOT_NORTH},
@@ -27,6 +28,7 @@ CBoard::~CBoard()
 void CBoard::Create(CWnd* pParent)
 {
 	int x, y;
+	UINT nID = ID_TILE_BUTTON;
 	for (int col = 0; col < _size; col++)
 	{
 		for (int row = (_size-1); row >= 0; row--)
@@ -34,7 +36,7 @@ void CBoard::Create(CWnd* pParent)
 			x = 10 + (col * TILE_SIZE);
 			y = 10 + ((_size-row-1) * TILE_SIZE);
 
-			CTile* tile = new CTile(pParent, CPoint(x, y), col, row);
+			CTile* tile = new CTile(pParent, CPoint(x, y), col, row, nID++);
 			_tiles.push_back(tile);
 		}
 	}
@@ -55,7 +57,7 @@ void CBoard::DisplayRobot(const Robot& robot)
 				return tile->GetCoordinate() == coordinate;
 			});
 
-		VERIFY(*vtile != nullptr);
+		VERIFY(nullptr  != *vtile);
 
 		Direction direction = robot.GetDirection();
 		CTile* tile = (*vtile);
@@ -83,4 +85,28 @@ void CBoard::DisplayRobot(const Robot& robot)
 		}
 		_prevTile = tile;
 	}
+}
+
+bool CBoard::IsRobotTileClicked(UINT nID)
+{
+	bool clicked = false;
+	if (nullptr != _prevTile)
+	{
+		// Find tile
+		auto vtile = find_if(
+			_tiles.begin(),
+			_tiles.end(),
+			[nID](const CTile* tile)
+			{
+				return tile->GetDlgCtrlID() == nID;
+			});
+		VERIFY(nullptr != *vtile);
+
+		CTile* tile = (*vtile);
+		if (tile->GetCoordinate() == _prevTile->GetCoordinate())
+		{
+			clicked = true;
+		}
+	}
+	return clicked;
 }

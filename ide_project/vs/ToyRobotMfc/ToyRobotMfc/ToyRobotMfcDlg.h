@@ -6,13 +6,7 @@
 
 #include "command_parser.hpp"
 #include "Board.h"
-
-// IO IDs
-enum
-{
-	ID_COMMAND_INPUT = 1000,
-	ID_COMMAND_RESPONSE
-};
+#include "id.h"
 
 #define TABLE_SIZE 5
 
@@ -53,4 +47,6 @@ private:
 	CEdit _edtCommandResponse;
 
 	void ExecuteCommand();
+public:
+	afx_msg void OnBtnClickedTile(UINT nID);
 };

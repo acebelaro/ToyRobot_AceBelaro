@@ -194,6 +194,7 @@
     <ClInclude Include="..\..\..\..\include\RobotPosition.hpp" />
     <ClInclude Include="..\..\..\..\include\table.hpp" />
     <ClInclude Include="Board.h" />
+    <ClInclude Include="id.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
