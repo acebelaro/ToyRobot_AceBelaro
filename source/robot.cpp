@@ -39,6 +39,10 @@ void Robot::RotateLeft()
 		direction = static_cast<Direction>(dirInt);
 		_position->SetDirection(direction );
 	}
+	else
+	{		
+		cout << "Robot not yet placed";
+    }
 }
 
 void Robot::RotateRight()
@@ -54,6 +58,10 @@ void Robot::RotateRight()
 		direction = static_cast<Direction>(dirInt);
 		_position->SetDirection(direction);
 	}
+	else
+	{		
+		cout << "Robot not yet placed";
+    }
 }
 
 bool Robot::Move(const Table& table)
@@ -87,23 +95,29 @@ bool Robot::Move(const Table& table)
 			_position->SetCoordinate(newCoordinate);
 		}
 	}
+	else
+	{		
+		cout << "Robot not yet placed";
+    }
 
 	return result;
 }
 
 string Robot::Report() const
 {
-    stringstream report;
+    string report("");
     if( nullptr != _position )
 	{
+		stringstream positionReport;
 		string direction(DirectionToString(_position->GetDirection()));
-        report << _position->GetCoordinate().GetX() << "," << _position->GetCoordinate().GetY() << "," << direction;   
+        positionReport << _position->GetCoordinate().GetX() << "," << _position->GetCoordinate().GetY() << "," << direction;
+		report = positionReport.str();
     }
 	else
 	{		
-		report << "Robot not yet placed";
+		cout << "Robot not yet placed";
     }
-    return report.str();
+    return report;
 }
 
 bool Robot::IsPlaced() const

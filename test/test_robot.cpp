@@ -423,7 +423,7 @@ static void test_robotReportWhenRobotIsNotYetPlaced()
 {
 	Robot robot;
 
-	assert( robot.Report().compare("Robot not yet placed") == 0 );
+	assert( robot.Report().compare("") == 0 );
 }
 
 int testRobot()
