@@ -47,38 +47,40 @@ void CBoard::DisplayRobot(const Robot& robot)
 		Coordinate coordinate = robot.GetCoordinate();
 
 		// Find tile
-		auto vtile = find_if(_tiles.begin(), _tiles.end(),
+		auto vtile = find_if(
+			_tiles.begin(),
+			_tiles.end(),
 			[coordinate](const CTile* tile)
 			{
 				return tile->GetCoordinate() == coordinate;
 			});
 
-		if (*vtile != nullptr)
+		VERIFY(*vtile != nullptr);
+
+		Direction direction = robot.GetDirection();
+		CTile* tile = (*vtile);
+
+		auto directionBitMap = find_if(
+			directionBitMapMap.begin(),
+			directionBitMapMap.end(),
+			[direction](const auto& it) {
+				return it.first == direction;
+			});
+		VERIFY(directionBitMap != directionBitMapMap.end());
+
+		CBitmap bmp;
+		VERIFY(bmp.LoadBitmap(directionBitMap->second));
+		HBITMAP hbmp = HBITMAP(bmp.Detach());
+
+		tile->SetBitmap(hbmp);
+		if (nullptr != _prevTile)
 		{
-			Direction direction = robot.GetDirection();
-			CTile* tile = (*vtile);
-
-			auto directionBitMap = find_if(directionBitMapMap.begin(), directionBitMapMap.end(),
-				[direction](const pair<Direction, int> it) {
-					return it.first == direction;
-				});
-			assert(directionBitMap != directionBitMapMap.end());
-
-			CBitmap bmp;
-			assert(bmp.LoadBitmapW(directionBitMap->second));
-			HBITMAP hbmp = HBITMAP(bmp.Detach());
-
-			tile->SetBitmap(hbmp);
-			if (nullptr != _prevTile)
+			if (!(_prevTile->GetCoordinate() == tile->GetCoordinate()))
 			{
-				if (!(_prevTile->GetCoordinate() == tile->GetCoordinate()))
-				{
-					// clear previous tile
-					_prevTile->SetBitmap(NULL);
-				}
+				// clear previous tile
+				_prevTile->SetBitmap(NULL);
 			}
-			_prevTile = tile;
 		}
+		_prevTile = tile;
 	}
 }
-

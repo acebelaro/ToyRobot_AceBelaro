@@ -59,7 +59,7 @@ BOOL CToyRobotMfcDlg::OnInitDialog()
 	int edtWidth = windowWidth - 35;
 
 	_edtCommandInput.Create(
-		ES_MULTILINE | WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_NOHIDESEL,
+		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_NOHIDESEL,
 		CRect(CPoint(10, editY), CSize(edtWidth, 35)),
 		this,
 		ID_COMMAND_INPUT);
