@@ -2,20 +2,21 @@
 
 #include <map>
 #include <vector>
+#include "table.hpp"
 #include "Tile.h"
 #include "robot.hpp"
 
 using namespace std;
 
-class CBoard
+class CBoard : public Table
 {
 public:
-	CBoard(int);
-	~CBoard();
+	CBoard();
+	virtual ~CBoard();
 	void Create(CWnd*);
 	void DisplayRobot(const Robot&);
+	bool IsRobotTileClicked(UINT);
 private:
-	int _size;
 	vector<CTile*> _tiles;
-	CTile* _prevTile; // for clearing
+	CTile* _robotTile;
 };

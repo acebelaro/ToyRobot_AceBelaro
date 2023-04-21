@@ -6,7 +6,9 @@
 #include "framework.h"
 #include "ToyRobotMfc.h"
 #include "ToyRobotMfcDlg.h"
+#include "BoardSetupDlg.h"
 #include "afxdialogex.h"
+
 #include <sstream>
 #include <algorithm>
 #include <WinUser.h>
@@ -22,9 +24,7 @@
 
 CToyRobotMfcDlg::CToyRobotMfcDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_TOYROBOTMFC_DIALOG, pParent),
-	_table(TABLE_SIZE, TABLE_SIZE),
-	_commandParser(_robot, _table),
-	_board(TABLE_SIZE)
+	_commandParser(_robot, _board)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -37,6 +37,7 @@ void CToyRobotMfcDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CToyRobotMfcDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_CONTROL_RANGE(BN_CLICKED, ID_TILE_BUTTON, ID_TILE_BUTTON_MAX, &CToyRobotMfcDlg::OnBtnClickedTile)
 END_MESSAGE_MAP()
 
 
@@ -46,32 +47,52 @@ BOOL CToyRobotMfcDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
+	CBoardSetupDlg boardSetupDlg(this);
+	INT_PTR nResponse = boardSetupDlg.DoModal();
+	int width, height;
+	if (nResponse == IDOK)
+	{
+		width = boardSetupDlg.GetWidth();
+		height = boardSetupDlg.GetHeight();
+	}
+	else
+	{
+		// default
+		width = DEFAULT_WIDTH;
+		height = DEFAULT_HEIGHT;
+	}
+	
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
+	_board.SetWidth(width);
+	_board.SetHeight(height);
 	_board.Create(this);
 
-	int windowWidth = 10 + ((5 + TILE_SIZE) * TABLE_SIZE);
+	const int margin = 10;
+	const int tileSize = TILE_SIZE;
+	const int windowWidth = (tileSize * width) + 15 + (2 * margin);
 
-	int editY = ((5 + TILE_SIZE) * TABLE_SIZE);
-	int edtWidth = windowWidth - 35;
-
+	const int edtWidth = windowWidth - (15 + (2 * margin));
+	const int commandInputHeight = 35;
+	int editY = (tileSize * height) + 20;
 	_edtCommandInput.Create(
 		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_NOHIDESEL,
-		CRect(CPoint(10, editY), CSize(edtWidth, 35)),
+		CRect(CPoint(margin, editY), CSize(edtWidth, commandInputHeight)),
 		this,
 		ID_COMMAND_INPUT);
 
 	editY += 40;
+	const int commandResponseHeight = 70;
 	_edtCommandResponse.Create(
 		ES_MULTILINE | WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_NOHIDESEL | ES_READONLY,
-		CRect(CPoint(10, editY), CSize(edtWidth, 70)),
+		CRect(CPoint(margin, editY), CSize(edtWidth, commandResponseHeight)),
 		this,
 		ID_COMMAND_RESPONSE);
 
-	int windowHeight = editY + 130;
+	const int windowHeight = editY + 130;
 	SetWindowPos(NULL, 0, 0, windowWidth, windowHeight, SWP_NOMOVE | SWP_NOZORDER);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -122,16 +143,42 @@ BOOL CToyRobotMfcDlg::PreTranslateMessage(MSG* pMsg)
 			if (GetFocus() == &_edtCommandInput)
 			{
 				ExecuteCommand();
-				return TRUE;
 			}
-			else
+			return TRUE; // Do not process further
+		}
+		else if (GetKeyState(VK_CONTROL) & 0x80)
+		{
+			if (_robot.IsPlaced())
 			{
-				return TRUE;
+				bool handled = true;
+				switch (pMsg->wParam)
+				{
+				case 'M':
+					// CTRL + M
+					_robot.Move(_board);
+					break;
+				case 'R':
+					// CTRL + R
+					_robot.RotateRight();
+					break;
+				case 'L':
+					// CTRL + L
+					_robot.RotateLeft();
+					break;
+				default:
+					handled = false;
+					break;
+				}
+				if (handled)
+				{
+					_board.DisplayRobot(_robot);
+				}
 			}
+			return TRUE; // Do not process further
 		}
 		else if (pMsg->wParam == VK_ESCAPE)
 		{
-			return TRUE;                // Do not process further
+			return TRUE; // Do not process further                
 		}
 	}
 
@@ -155,36 +202,47 @@ void CToyRobotMfcDlg::ExecuteCommand()
 	_edtCommandInput.GetWindowText(sWindowText);
 	command = CT2A(sWindowText);
 
-	res = _commandParser.parseCommand(command);
-
-	// redirect output to original
-	cout.rdbuf(stream_buffer_cout);
-
-	stringstream response;
-	if (res)
+	if (!command.empty())
 	{
-		_board.DisplayRobot(_robot);
-		string cmdParserResponse = strCout.str();
-		if (!cmdParserResponse.empty())
+		res = _commandParser.parseCommand(command);
+
+		// redirect output to original
+		cout.rdbuf(stream_buffer_cout);
+
+		stringstream response;
+		if (res)
 		{
-			response << strCout.str();
+			_board.DisplayRobot(_robot);
+			string cmdParserResponse = strCout.str();
+			if (!cmdParserResponse.empty())
+			{
+				response << strCout.str();
+			}
+			else
+			{
+				response << "-";
+			}
 		}
 		else
-
 		{
-			response << "-";
+			response << "Invalid command";
 		}
+
+		stringstream responseLines;
+		responseLines << "Command Input: " << command << "\r\n"
+			<< "App Response : " << response.str() << endl;
+		_edtCommandResponse.SetWindowTextW(CString(responseLines.str().c_str()));
+
+		// clear command input
+		_edtCommandInput.SetWindowTextW(_T(""));
 	}
-	else
+}
+
+void CToyRobotMfcDlg::OnBtnClickedTile(UINT nID)
+{
+	if (_robot.IsPlaced() && _board.IsRobotTileClicked(nID))
 	{
-		response << "Invalid command";
+		_robot.Move(_board);
+		_board.DisplayRobot(_robot);
 	}
-
-	stringstream responseLines;
-	responseLines << "Command Input: " << command << "\r\n"
-		<< "App Response : " << response.str() << endl;
-	_edtCommandResponse.SetWindowTextW(CString(responseLines.str().c_str()));
-
-	// clear command input
-	_edtCommandInput.SetWindowTextW(_T(""));
 }

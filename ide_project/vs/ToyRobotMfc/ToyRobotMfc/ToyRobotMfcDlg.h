@@ -4,17 +4,10 @@
 
 #pragma once
 
+#include <memory>
 #include "command_parser.hpp"
 #include "Board.h"
-
-// IO IDs
-enum
-{
-	ID_COMMAND_INPUT = 1000,
-	ID_COMMAND_RESPONSE
-};
-
-#define TABLE_SIZE 5
+#include "id.h"
 
 // CToyRobotMfcDlg dialog
 class CToyRobotMfcDlg : public CDialogEx
@@ -44,7 +37,6 @@ protected:
 
 private:
 	Robot _robot;
-	Table _table;
 	CommandParser _commandParser;
 
 	// UI
@@ -53,4 +45,6 @@ private:
 	CEdit _edtCommandResponse;
 
 	void ExecuteCommand();
+public:
+	afx_msg void OnBtnClickedTile(UINT nID);
 };

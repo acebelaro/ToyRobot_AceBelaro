@@ -10,7 +10,7 @@ class CTile :
 {
 // Construction
 public:
-    CTile(CWnd*, CPoint&, int, int);
+    CTile(CWnd*, CPoint&, Coordinate&, UINT);
     virtual ~CTile() = default;
     const Coordinate& GetCoordinate() const;
 private:
