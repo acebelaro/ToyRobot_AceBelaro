@@ -23,9 +23,8 @@
 
 CToyRobotMfcDlg::CToyRobotMfcDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_TOYROBOTMFC_DIALOG, pParent),
-	_table(TABLE_SIZE, TABLE_SIZE),
-	_commandParser(_robot, _table),
-	_board(TABLE_SIZE)
+	_board(TABLE_SIZE_WIDTH, TABLE_SIZE_HEIGHT),
+	_commandParser(_robot, _board)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -38,7 +37,7 @@ void CToyRobotMfcDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CToyRobotMfcDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_CONTROL_RANGE(BN_CLICKED, ID_TILE_BUTTON, ID_TILE_BUTTON+(TABLE_SIZE* TABLE_SIZE), &CToyRobotMfcDlg::OnBtnClickedTile)
+	ON_CONTROL_RANGE(BN_CLICKED, ID_TILE_BUTTON, ID_TILE_BUTTON_MAX, &CToyRobotMfcDlg::OnBtnClickedTile)
 END_MESSAGE_MAP()
 
 
@@ -55,25 +54,28 @@ BOOL CToyRobotMfcDlg::OnInitDialog()
 
 	_board.Create(this);
 
-	int windowWidth = 10 + ((5 + TILE_SIZE) * TABLE_SIZE);
+	const int margin = 10;
+	const int tileSize = TILE_SIZE;
+	const int windowWidth = (tileSize * TABLE_SIZE_WIDTH) + 15 + (2 * margin);
 
-	int editY = ((5 + TILE_SIZE) * TABLE_SIZE);
-	int edtWidth = windowWidth - 35;
-
+	const int edtWidth = windowWidth - (15 + (2 * margin));
+	const int commandInputHeight = 35;
+	int editY = (tileSize * TABLE_SIZE_HEIGHT) + 20;
 	_edtCommandInput.Create(
 		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_NOHIDESEL,
-		CRect(CPoint(10, editY), CSize(edtWidth, 35)),
+		CRect(CPoint(margin, editY), CSize(edtWidth, commandInputHeight)),
 		this,
 		ID_COMMAND_INPUT);
 
 	editY += 40;
+	const int commandResponseHeight = 70;
 	_edtCommandResponse.Create(
 		ES_MULTILINE | WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_NOHIDESEL | ES_READONLY,
-		CRect(CPoint(10, editY), CSize(edtWidth, 70)),
+		CRect(CPoint(margin, editY), CSize(edtWidth, commandResponseHeight)),
 		this,
 		ID_COMMAND_RESPONSE);
 
-	int windowHeight = editY + 130;
+	const int windowHeight = editY + 130;
 	SetWindowPos(NULL, 0, 0, windowWidth, windowHeight, SWP_NOMOVE | SWP_NOZORDER);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -172,7 +174,6 @@ void CToyRobotMfcDlg::ExecuteCommand()
 			response << strCout.str();
 		}
 		else
-
 		{
 			response << "-";
 		}
@@ -193,9 +194,9 @@ void CToyRobotMfcDlg::ExecuteCommand()
 
 void CToyRobotMfcDlg::OnBtnClickedTile(UINT nID)
 {
-	if (_board.IsRobotTileClicked(nID))
+	if (_robot.IsPlaced() && _board.IsRobotTileClicked(nID))
 	{
-		_robot.Move(_table);
+		_robot.Move(_board);
 		_board.DisplayRobot(_robot);
 	}
 }

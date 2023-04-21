@@ -10,10 +10,10 @@ static map<Direction, int> directionBitMapMap = {
 	{Direction::WEST,IDB_ROBOT_WEST}
 };
 
-CBoard::CBoard(int size):
-	_size(size)
+CBoard::CBoard(int width, int height) :
+	Table(width, height)
 {
-	_prevTile = nullptr;
+	_robotTile = nullptr;
 }
 
 CBoard::~CBoard()
@@ -29,14 +29,17 @@ void CBoard::Create(CWnd* pParent)
 {
 	int x, y;
 	UINT nID = ID_TILE_BUTTON;
-	for (int col = 0; col < _size; col++)
+	int width = GetWidth();
+	int height = GetHeight();
+	for (int row = 0; row < width; row++)
 	{
-		for (int row = (_size-1); row >= 0; row--)
+		for (int col = (height -1); col >= 0; col--)
 		{
-			x = 10 + (col * TILE_SIZE);
-			y = 10 + ((_size-row-1) * TILE_SIZE);
+			x = 10 + (row * TILE_SIZE);
+			y = 10 + ((height -col-1) * TILE_SIZE);
 
-			CTile* tile = new CTile(pParent, CPoint(x, y), col, row, nID++);
+			Coordinate coordinate(row, col);
+			CTile* tile = new CTile(pParent, CPoint(x, y), coordinate, nID++);
 			_tiles.push_back(tile);
 		}
 	}
@@ -56,8 +59,7 @@ void CBoard::DisplayRobot(const Robot& robot)
 			{
 				return tile->GetCoordinate() == coordinate;
 			});
-
-		VERIFY(nullptr  != *vtile);
+		VERIFY(_tiles.end() != vtile);
 
 		Direction direction = robot.GetDirection();
 		CTile* tile = (*vtile);
@@ -68,42 +70,42 @@ void CBoard::DisplayRobot(const Robot& robot)
 			[direction](const auto& it) {
 				return it.first == direction;
 			});
-		VERIFY(directionBitMap != directionBitMapMap.end());
+		VERIFY(directionBitMapMap.end() != directionBitMap);
 
 		CBitmap bmp;
 		VERIFY(bmp.LoadBitmap(directionBitMap->second));
 		HBITMAP hbmp = HBITMAP(bmp.Detach());
 
 		tile->SetBitmap(hbmp);
-		if (nullptr != _prevTile)
+		if (nullptr != _robotTile)
 		{
-			if (!(_prevTile->GetCoordinate() == tile->GetCoordinate()))
+			if (!(_robotTile->GetCoordinate() == tile->GetCoordinate()))
 			{
 				// clear previous tile
-				_prevTile->SetBitmap(NULL);
+				_robotTile->SetBitmap(NULL);
 			}
 		}
-		_prevTile = tile;
+		_robotTile = tile;
 	}
 }
 
 bool CBoard::IsRobotTileClicked(UINT nID)
 {
 	bool clicked = false;
-	if (nullptr != _prevTile)
+	if (nullptr != _robotTile)
 	{
 		// Find tile
 		auto vtile = find_if(
 			_tiles.begin(),
 			_tiles.end(),
-			[nID](const CTile* tile)
+			[nID](const auto tile)
 			{
 				return tile->GetDlgCtrlID() == nID;
 			});
-		VERIFY(nullptr != *vtile);
+		VERIFY(vtile != _tiles.end());
 
 		CTile* tile = (*vtile);
-		if (tile->GetCoordinate() == _prevTile->GetCoordinate())
+		if (tile->GetCoordinate() == _robotTile->GetCoordinate())
 		{
 			clicked = true;
 		}

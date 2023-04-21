@@ -14,7 +14,7 @@
 class Table {
 public:
 	Table(int, int);
-	~Table() = default;
+	virtual ~Table() = default;
 
 private:
 	int _width;		/* table width */
