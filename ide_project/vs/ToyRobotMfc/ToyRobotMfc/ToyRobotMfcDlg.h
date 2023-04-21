@@ -4,16 +4,10 @@
 
 #pragma once
 
+#include <memory>
 #include "command_parser.hpp"
 #include "Board.h"
 #include "id.h"
-
-#define TABLE_SIZE_WIDTH	5
-#define TABLE_SIZE_HEIGHT	5
-
-#if TABLE_SIZE_WIDTH*TABLE_SIZE_HEIGHT>TILE_BUTTON_COUNT
-#error TABLE_SIZE exceeds allowed tile count.
-#endif
 
 // CToyRobotMfcDlg dialog
 class CToyRobotMfcDlg : public CDialogEx

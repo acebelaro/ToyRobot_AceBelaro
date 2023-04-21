@@ -10,8 +10,8 @@ static map<Direction, int> directionBitMapMap = {
 	{Direction::WEST,IDB_ROBOT_WEST}
 };
 
-CBoard::CBoard(int width, int height) :
-	Table(width, height)
+CBoard::CBoard() :
+	Table(0, 0)
 {
 	_robotTile = nullptr;
 }

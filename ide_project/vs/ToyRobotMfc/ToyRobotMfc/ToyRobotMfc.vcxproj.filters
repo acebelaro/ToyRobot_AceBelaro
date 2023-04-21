@@ -28,6 +28,9 @@
     <ClCompile Include="Board.cpp">
       <Filter>source\ui</Filter>
     </ClCompile>
+    <ClCompile Include="BoardSetupDlg.cpp">
+      <Filter>source\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -63,12 +66,19 @@
     <ClInclude Include="id.h">
       <Filter>source\ui</Filter>
     </ClInclude>
+    <ClInclude Include="BoardSetupDlg.h">
+      <Filter>source\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ToyRobotMfc.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\ToyRobotMfc.ico" />
+    <Image Include="res\Robot_east.bmp" />
+    <Image Include="res\Robot_north.bmp" />
+    <Image Include="res\Robot_south.bmp" />
+    <Image Include="res\Robot_west.bmp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ToyRobotMfc.rc2" />

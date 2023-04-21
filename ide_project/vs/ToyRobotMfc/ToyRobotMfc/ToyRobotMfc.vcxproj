@@ -194,6 +194,7 @@
     <ClInclude Include="..\..\..\..\include\RobotPosition.hpp" />
     <ClInclude Include="..\..\..\..\include\table.hpp" />
     <ClInclude Include="Board.h" />
+    <ClInclude Include="BoardSetupDlg.h" />
     <ClInclude Include="id.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="framework.h" />
@@ -211,6 +212,7 @@
     <ClCompile Include="..\..\..\..\source\RobotPosition.cpp" />
     <ClCompile Include="..\..\..\..\source\table.cpp" />
     <ClCompile Include="Board.cpp" />
+    <ClCompile Include="BoardSetupDlg.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -228,6 +230,10 @@
     <None Include="res\ToyRobotMfc.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\Robot_east.bmp" />
+    <Image Include="res\Robot_north.bmp" />
+    <Image Include="res\Robot_south.bmp" />
+    <Image Include="res\Robot_west.bmp" />
     <Image Include="res\ToyRobotMfc.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

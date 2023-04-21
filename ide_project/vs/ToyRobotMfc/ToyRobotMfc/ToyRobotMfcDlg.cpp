@@ -6,6 +6,7 @@
 #include "framework.h"
 #include "ToyRobotMfc.h"
 #include "ToyRobotMfcDlg.h"
+#include "BoardSetupDlg.h"
 #include "afxdialogex.h"
 
 #include <sstream>
@@ -23,7 +24,6 @@
 
 CToyRobotMfcDlg::CToyRobotMfcDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_TOYROBOTMFC_DIALOG, pParent),
-	_board(TABLE_SIZE_WIDTH, TABLE_SIZE_HEIGHT),
 	_commandParser(_robot, _board)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -47,20 +47,37 @@ BOOL CToyRobotMfcDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
+	CBoardSetupDlg boardSetupDlg(this);
+	INT_PTR nResponse = boardSetupDlg.DoModal();
+	int width, height;
+	if (nResponse == IDOK)
+	{
+		width = boardSetupDlg.GetWidth();
+		height = boardSetupDlg.GetHeight();
+	}
+	else
+	{
+		// default
+		width = DEFAULT_WIDTH;
+		height = DEFAULT_HEIGHT;
+	}
+	
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
+	_board.SetWidth(width);
+	_board.SetHeight(height);
 	_board.Create(this);
 
 	const int margin = 10;
 	const int tileSize = TILE_SIZE;
-	const int windowWidth = (tileSize * TABLE_SIZE_WIDTH) + 15 + (2 * margin);
+	const int windowWidth = (tileSize * width) + 15 + (2 * margin);
 
 	const int edtWidth = windowWidth - (15 + (2 * margin));
 	const int commandInputHeight = 35;
-	int editY = (tileSize * TABLE_SIZE_HEIGHT) + 20;
+	int editY = (tileSize * height) + 20;
 	_edtCommandInput.Create(
 		WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_NOHIDESEL,
 		CRect(CPoint(margin, editY), CSize(edtWidth, commandInputHeight)),
@@ -185,37 +202,40 @@ void CToyRobotMfcDlg::ExecuteCommand()
 	_edtCommandInput.GetWindowText(sWindowText);
 	command = CT2A(sWindowText);
 
-	res = _commandParser.parseCommand(command);
-
-	// redirect output to original
-	cout.rdbuf(stream_buffer_cout);
-
-	stringstream response;
-	if (res)
+	if (!command.empty())
 	{
-		_board.DisplayRobot(_robot);
-		string cmdParserResponse = strCout.str();
-		if (!cmdParserResponse.empty())
+		res = _commandParser.parseCommand(command);
+
+		// redirect output to original
+		cout.rdbuf(stream_buffer_cout);
+
+		stringstream response;
+		if (res)
 		{
-			response << strCout.str();
+			_board.DisplayRobot(_robot);
+			string cmdParserResponse = strCout.str();
+			if (!cmdParserResponse.empty())
+			{
+				response << strCout.str();
+			}
+			else
+			{
+				response << "-";
+			}
 		}
 		else
 		{
-			response << "-";
+			response << "Invalid command";
 		}
-	}
-	else
-	{
-		response << "Invalid command";
-	}
 
-	stringstream responseLines;
-	responseLines << "Command Input: " << command << "\r\n"
-		<< "App Response : " << response.str() << endl;
-	_edtCommandResponse.SetWindowTextW(CString(responseLines.str().c_str()));
+		stringstream responseLines;
+		responseLines << "Command Input: " << command << "\r\n"
+			<< "App Response : " << response.str() << endl;
+		_edtCommandResponse.SetWindowTextW(CString(responseLines.str().c_str()));
 
-	// clear command input
-	_edtCommandInput.SetWindowTextW(_T(""));
+		// clear command input
+		_edtCommandInput.SetWindowTextW(_T(""));
+	}
 }
 
 void CToyRobotMfcDlg::OnBtnClickedTile(UINT nID)
