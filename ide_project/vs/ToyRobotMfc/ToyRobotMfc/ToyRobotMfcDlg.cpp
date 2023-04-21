@@ -126,16 +126,42 @@ BOOL CToyRobotMfcDlg::PreTranslateMessage(MSG* pMsg)
 			if (GetFocus() == &_edtCommandInput)
 			{
 				ExecuteCommand();
-				return TRUE;
 			}
-			else
+			return TRUE; // Do not process further
+		}
+		else if (GetKeyState(VK_CONTROL) & 0x80)
+		{
+			if (_robot.IsPlaced())
 			{
-				return TRUE;
+				bool handled = true;
+				switch (pMsg->wParam)
+				{
+				case 'M':
+					// CTRL + M
+					_robot.Move(_board);
+					break;
+				case 'R':
+					// CTRL + R
+					_robot.RotateRight();
+					break;
+				case 'L':
+					// CTRL + L
+					_robot.RotateLeft();
+					break;
+				default:
+					handled = false;
+					break;
+				}
+				if (handled)
+				{
+					_board.DisplayRobot(_robot);
+				}
 			}
+			return TRUE; // Do not process further
 		}
 		else if (pMsg->wParam == VK_ESCAPE)
 		{
-			return TRUE;                // Do not process further
+			return TRUE; // Do not process further                
 		}
 	}
 
