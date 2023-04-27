@@ -3,9 +3,15 @@
 	@brief      Source definition for command parser
 */
 //******************************************************************************
-#include "command_parser.hpp"
+
 #include <iostream>
 #include <sstream>
+
+#include "command_parser.hpp"
+#include "place_command.hpp"
+#include "move_command.hpp"
+#include "rotate_command.hpp"
+#include "report_command.hpp"
 
 //******************************************************************************
 //               Private macros
@@ -15,8 +21,7 @@
 //               Class function definition
 //******************************************************************************
 
-CommandParser::CommandParser(Robot& robot,Table& table):
-	_robot(robot), _table(table)
+CommandParser::CommandParser()
 {
 	createCommands();
 }
@@ -24,8 +29,8 @@ CommandParser::CommandParser(Robot& robot,Table& table):
 void CommandParser::createCommands()
 {
 	_commandRegexFunctionMap.insert(make_pair(
-		"^\\s*(PLACE)\\s+([0-9])+\\s*,\\s*([0-9]+)\\s*,\\s*(NORTH|SOUTH|EAST|WEST)\\s*$",
-		[&] (const smatch & match)
+		PlaceCommand::PATTERN,
+		[](const smatch & match, UPTR_COMMAND &cmd)
 		{
 			int x = stoi(match[2]);
 			int y = stoi(match[3]);
@@ -33,50 +38,43 @@ void CommandParser::createCommands()
 			Direction direction = StringToDirection(directionStr);
 			Coordinate coordinate(x,y);
 			RobotPosition position(coordinate,direction);
-			_robot.Place(position,_table);
+			cmd.reset(new PlaceCommand(position));
 		}
 	));
 
 	_commandRegexFunctionMap.insert(make_pair(
-		"^\\s*MOVE\\s*$",
-		[&] (const smatch & match)
+		MoveCommand::PATTERN,
+		[](const smatch & match, UPTR_COMMAND &cmd)
 		{
-			_robot.Move(_table);
+			cmd.reset(new MoveCommand());
 		}
 	));
 
 	_commandRegexFunctionMap.insert(make_pair(
-		"^\\s*LEFT\\s*$",
-		[&] (const smatch & match)
+		RotateCommand::PATTERN,
+		[](const smatch & match, UPTR_COMMAND &cmd)
 		{
-			_robot.RotateLeft();
-		}
-	));
-
-	_commandRegexFunctionMap.insert(make_pair(
-		"^\\s*RIGHT\\s*$",
-		[&] (const smatch & match)
-		{
-			_robot.RotateRight();
-		}
-	));
-
-	_commandRegexFunctionMap.insert(make_pair(
-		"^\\s*REPORT\\s*$",
-		[&] (const smatch & match)
-		{
-			stringstream report;
-			string robotReport = _robot.Report();
-			if( robotReport.compare("") != 0 )
+			if( 0 == match[1].compare("LEFT") )
 			{
-				report << "Output : " << _robot.Report();
-				cout << report.str() << endl;
-			}			
+				cmd.reset(new RotateCommand(Rotate::LEFT));
+			}
+			else if( 0 == match[1].compare("RIGHT") )
+			{
+				cmd.reset(new RotateCommand(Rotate::RIGHT));
+			}
+		}
+	));
+
+	_commandRegexFunctionMap.insert(make_pair(
+		ReportCommand::PATTERN,
+		[](const smatch & match, UPTR_COMMAND &cmd)
+		{
+			cmd.reset(new ReportCommand());
 		}
 	));
 }
 
-bool CommandParser::parseCommand(string strCommand)
+bool CommandParser::parseCommand(string strCommand, UPTR_COMMAND &cmd)
 {
 	bool res = false;
 	for( auto & it: _commandRegexFunctionMap )
@@ -85,7 +83,7 @@ bool CommandParser::parseCommand(string strCommand)
 		smatch match;
 		if( it.second && regex_search(strCommand, match, rgx) )
 		{
-			it.second(match);
+			it.second(match,cmd);
 			res = true;
 			break;
 		}

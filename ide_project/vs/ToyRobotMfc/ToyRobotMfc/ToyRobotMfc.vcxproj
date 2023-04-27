@@ -29,14 +29,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
@@ -44,14 +44,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
@@ -187,11 +187,16 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\include\command.hpp" />
     <ClInclude Include="..\..\..\..\include\command_parser.hpp" />
     <ClInclude Include="..\..\..\..\include\coordinate.hpp" />
     <ClInclude Include="..\..\..\..\include\direction.hpp" />
+    <ClInclude Include="..\..\..\..\include\move_command.hpp" />
+    <ClInclude Include="..\..\..\..\include\place_command.hpp" />
+    <ClInclude Include="..\..\..\..\include\report_command.hpp" />
     <ClInclude Include="..\..\..\..\include\robot.hpp" />
     <ClInclude Include="..\..\..\..\include\RobotPosition.hpp" />
+    <ClInclude Include="..\..\..\..\include\rotate_command.hpp" />
     <ClInclude Include="..\..\..\..\include\table.hpp" />
     <ClInclude Include="Board.h" />
     <ClInclude Include="BoardSetupDlg.h" />
@@ -208,8 +213,12 @@
     <ClCompile Include="..\..\..\..\source\command_parser.cpp" />
     <ClCompile Include="..\..\..\..\source\coordinate.cpp" />
     <ClCompile Include="..\..\..\..\source\direction.cpp" />
+    <ClCompile Include="..\..\..\..\source\move_command.cpp" />
+    <ClCompile Include="..\..\..\..\source\place_command.cpp" />
+    <ClCompile Include="..\..\..\..\source\report_command.cpp" />
     <ClCompile Include="..\..\..\..\source\robot.cpp" />
     <ClCompile Include="..\..\..\..\source\RobotPosition.cpp" />
+    <ClCompile Include="..\..\..\..\source\rotate_command.cpp" />
     <ClCompile Include="..\..\..\..\source\table.cpp" />
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="BoardSetupDlg.cpp" />
