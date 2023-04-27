@@ -32,7 +32,11 @@ SOURCES := .\source\direction.cpp \
 			.\source\command_parser.cpp \
 			.\source\table.cpp \
 			.\source\RobotPosition.cpp \
-			.\source\robot.cpp
+			.\source\robot.cpp \
+			.\source\place_command.cpp \
+			.\source\move_command.cpp \
+			.\source\rotate_command.cpp \
+			.\source\report_command.cpp
 
 ${TARGET}: ${SOURCES}
 	${CC} ${BUILD_CPPFLAGS} -o ${TARGET} ${SOURCES} ${APP_SOURCE}

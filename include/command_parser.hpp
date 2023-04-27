@@ -11,12 +11,11 @@
 #include <map>
 #include <iostream>
 
-#include "robot.hpp"
-#include "table.hpp"
+#include "command.hpp"
 
 using namespace std;
 
-typedef function<void (const smatch & match)> tCommandExecuteFunction;
+typedef function<void (const smatch&, UPTR_COMMAND&)> tCommandExecuteFunction;
 
 typedef map<string,tCommandExecuteFunction> tCommandRegexExecutionFunctionMap;
 
@@ -28,17 +27,13 @@ typedef map<string,tCommandExecuteFunction> tCommandRegexExecutionFunctionMap;
 class CommandParser
 {
 	public:
-		CommandParser(Robot&,Table&);
+		CommandParser();
 		~CommandParser() = default;
-
-	private:
-		Robot & _robot;
-		Table & _table;
 
 	private:
 		tCommandRegexExecutionFunctionMap _commandRegexFunctionMap;
 		void createCommands();
 		
 	public:
-		bool parseCommand(string strCommand);
+		bool parseCommand(string, UPTR_COMMAND&);
 };

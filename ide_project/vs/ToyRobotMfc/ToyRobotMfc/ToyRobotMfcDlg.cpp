@@ -23,8 +23,7 @@
 
 
 CToyRobotMfcDlg::CToyRobotMfcDlg(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_TOYROBOTMFC_DIALOG, pParent),
-	_commandParser(_robot, _board)
+	: CDialogEx(IDD_TOYROBOTMFC_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -204,7 +203,8 @@ void CToyRobotMfcDlg::ExecuteCommand()
 
 	if (!command.empty())
 	{
-		res = _commandParser.parseCommand(command);
+		UPTR_COMMAND cmd;
+		res = _commandParser.parseCommand(command, cmd);
 
 		// redirect output to original
 		cout.rdbuf(stream_buffer_cout);
@@ -212,6 +212,8 @@ void CToyRobotMfcDlg::ExecuteCommand()
 		stringstream response;
 		if (res)
 		{
+			cmd->Execute(_robot, _board);
+
 			_board.DisplayRobot(_robot);
 			string cmdParserResponse = strCout.str();
 			if (!cmdParserResponse.empty())

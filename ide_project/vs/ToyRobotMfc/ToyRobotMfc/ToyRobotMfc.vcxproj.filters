@@ -31,6 +31,18 @@
     <ClCompile Include="BoardSetupDlg.cpp">
       <Filter>source\ui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\source\rotate_command.cpp">
+      <Filter>source\toy_robot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\place_command.cpp">
+      <Filter>source\toy_robot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\move_command.cpp">
+      <Filter>source\toy_robot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\report_command.cpp">
+      <Filter>source\toy_robot</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -68,6 +80,21 @@
     </ClInclude>
     <ClInclude Include="BoardSetupDlg.h">
       <Filter>source\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\rotate_command.hpp">
+      <Filter>source\toy_robot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\place_command.hpp">
+      <Filter>source\toy_robot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\report_command.hpp">
+      <Filter>source\toy_robot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\move_command.hpp">
+      <Filter>source\toy_robot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\command.hpp">
+      <Filter>source\toy_robot</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

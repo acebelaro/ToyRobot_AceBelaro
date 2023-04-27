@@ -71,7 +71,7 @@ void CToyRobotApp::PrintTable()
 
 void CToyRobotApp::Play()
 {
-	CommandParser commandParser(_robot,_table);
+	CommandParser commandParser;
 	string input;
 
 	while (true) {
@@ -84,7 +84,13 @@ void CToyRobotApp::Play()
 		}
 		else 
 		{
-			commandParser.parseCommand(input);
+			UPTR_COMMAND cmd;
+			commandParser.parseCommand(input,cmd);
+			if( cmd != nullptr )
+			{
+				cmd->Execute(_robot,_table);
+				cout << endl;
+			}
 		}
 	}
 }
@@ -99,5 +105,5 @@ int main() {
 
 	app.Play();
 
-	return 1;
+	return 0;
 }
